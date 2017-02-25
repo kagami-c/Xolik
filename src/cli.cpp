@@ -15,8 +15,8 @@ size_t FindProteinNameEnd(const char* name) {
     return end;
 }
 
-void WriteResults(const char* output_path, const std::vector<Record>& records, 
-                  const PPData& ppdata, const Params& params, 
+void WriteResults(const char* output_path, const std::vector<Record>& records,
+                  const PPData& ppdata, const Params& params,
                   const std::vector<double>& q_values) {
     std::ofstream file(output_path);
     file << "ScanNum,Score,Peptide#1,LinkSite#1,Protein#1,Score#1,"
@@ -43,9 +43,9 @@ Params ParseArguments(int argc, const char** argv) {
     using StringArg = TCLAP::ValueArg<std::string>;
     using DoubleArg = TCLAP::ValueArg<double>;
     TCLAP::CmdLine cmd("LimXL - Linear-time matching algorithm for searching cross-linked peptides", ' ', "beta");
-	TCLAP::ValueArg<int> rank_arg("", "rank", "Rank threshold, used together with --enable_rank", false, 1000, "Rank", cmd);
-	TCLAP::SwitchArg enable_rank_arg("", "enable_rank", "Enable rank-based filter", cmd);
-	DoubleArg thresh_arg("", "threshold", "Score threshold", false, 0.0001, "Xcorr", cmd);
+    TCLAP::ValueArg<int> rank_arg("", "rank", "Rank threshold, used together with --enable_rank", false, 1000, "Rank", cmd);
+    TCLAP::SwitchArg enable_rank_arg("", "enable_rank", "Enable rank-based filter", cmd);
+    DoubleArg thresh_arg("", "threshold", "Score threshold", false, 0.0001, "Xcorr", cmd);
     DoubleArg ms2_tol_arg("", "ms2tol", "MS2 tolerance", false, 0.5, "Da", cmd);
     DoubleArg ms1_tol_arg("", "ms1tol", "MS1 tolerance", false, 50, "PPM", cmd);
     DoubleArg xlmass_arg("", "xlmass", "Cross linker mass", false, 138.0680796, "MASS", cmd);
@@ -66,22 +66,22 @@ Params ParseArguments(int argc, const char** argv) {
     params.output_path = output_path_arg.getValue();
     params.use_LimXL_match = disable_LimXL_arg.getValue() ? false : true;
     params.append_decoy = disable_decoy_arg.getValue() ? false : true;
-	params.max_miss_cleavage = miss_cleavage_arg.getValue();
-	params.min_allowed_mass = min_mass_arg.getValue();
-	params.max_allowed_mass = max_mass_arg.getValue();
+    params.max_miss_cleavage = miss_cleavage_arg.getValue();
+    params.min_allowed_mass = min_mass_arg.getValue();
+    params.max_allowed_mass = max_mass_arg.getValue();
     params.xlsite = xlsite_arg.getValue();
     params.xlmass = xlmass_arg.getValue();
     params.ms1_tolerance = ms1_tol_arg.getValue();
     params.ms2_tolerance = ms2_tol_arg.getValue();
-	params.threshold = thresh_arg.getValue();
-	params.enable_rank = enable_rank_arg.getValue();
-	params.rank = rank_arg.getValue();
-	
+    params.threshold = thresh_arg.getValue();
+    params.enable_rank = enable_rank_arg.getValue();
+    params.rank = rank_arg.getValue();
+
     return params;
 }
 
 void PrintSettings(const Params& params) {
-    printf("LimXL ver.beta\n");
+    printf("LimXL ver.beta (%s, %s)\n", __DATE__, __TIME__);
     printf("Database:              %s\n", params.database_path.c_str());
     printf("Spectra:               %s\n", params.mzfile_path.c_str());
     printf("Output path:           %s\n", params.output_path.c_str());
@@ -94,9 +94,9 @@ void PrintSettings(const Params& params) {
     printf("Cross linker mass:     %f Da\n", params.xlmass);
     printf("MS1 tolerance:         %.2f ppm\n", params.ms1_tolerance);
     printf("MS2 tolerance:         %.4f Da\n", params.ms2_tolerance);
-	printf("Score threshold:       %.4f\n", params.threshold);
-	printf("Enable rank filter:    %s\n", params.enable_rank ? "true" : "false");
-	printf("Rank threshold:        %d\n", params.rank);
+    printf("Score threshold:       %.4f\n", params.threshold);
+    printf("Enable rank filter:    %s\n", params.enable_rank ? "true" : "false");
+    printf("Rank threshold:        %d\n", params.rank);
 }
 
 int main(int argc, const char** argv) {
@@ -110,10 +110,10 @@ int main(int argc, const char** argv) {
 
     printf(">> Preparing data...\n");
     MzLoader loader(params.mzfile_path.c_str());
-    PPData ppdata(params.database_path.c_str(), params.append_decoy, 
+    PPData ppdata(params.database_path.c_str(), params.append_decoy,
                   PPData::EnzymeType::Trypsin, params.max_miss_cleavage,
                   params.min_allowed_mass, params.max_allowed_mass);
-    
+
     printf(">> Searching...\n");
     auto results = Search(loader, ppdata, params);
     auto q_values = CalculateFDR(results, ppdata);
@@ -123,7 +123,7 @@ int main(int argc, const char** argv) {
     auto end_time = std::chrono::system_clock::to_time_t(end);
     printf(">> End at %s", std::ctime(&end_time));
     std::chrono::duration<double> elapsed = end - start;
-	std::cout << ">> Elapsed: " << elapsed.count() << "s\n";
+    std::cout << ">> Elapsed: " << elapsed.count() << "s\n";
 
     return 0;
 }
