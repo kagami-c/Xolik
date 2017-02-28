@@ -33,7 +33,8 @@ intra['qValue'] = pd.Series(q_values)
 
 intra = intra.drop(['index', 'Decoy', 'CumDecoy', 'Total', 'FDR'], axis=1)
 intra.to_csv(sys.argv[1] + '.intra.csv', index=False)
-
+filtered = intra[(~intra['Protein#1'].str.startswith('DECOY_')) & (~intra['Protein#2'].str.startswith('DECOY_'))]
+filtered.to_csv(sys.argv[1] + '.intra.filtered.csv', index=False)
 
 # re-control inter results
 inter['U'] = ((inter['Protein#1'].str.startswith('DECOY_') & ~inter['Protein#2'].str.startswith('DECOY_'))
@@ -65,3 +66,5 @@ inter['qValue'] = pd.Series(q_values)
 
 inter = inter.drop(['index', 'U', 'F', 'CumU', 'CumF', 'Total', 'FDR'], axis=1)
 inter.to_csv(sys.argv[1] + '.inter.csv', index=False)
+filtered = inter[(~inter['Protein#1'].str.startswith('DECOY_')) & (~inter['Protein#2'].str.startswith('DECOY_'))]
+filtered.to_csv(sys.argv[1] + '.inter.filtered.csv', index=False)
