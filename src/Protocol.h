@@ -53,7 +53,7 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
         // preprocess experimental spectrum
         auto precursor_mass = (spectrum_buffer.precursor_mz - PROTON_MASS) * spectrum_buffer.precursor_charge;
         auto processed_peaks = Preprocess(spectrum_buffer.peaks, params.ms2_tolerance);
-        double tolerance_in_da = spectrum_buffer.precursor_mz * params.ms1_tolerance / 1000000;
+        double tolerance_in_da = precursor_mass * params.ms1_tolerance / 1000000;
 
         // calculate end_idx
         auto max_allowed_peptide_mass = precursor_mass - params.xlmass - params.min_allowed_mass + tolerance_in_da;
