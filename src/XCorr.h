@@ -66,29 +66,62 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
 		double new_intensity = old_intensity - (sum - old_intensity) / (window_size - 1);
 		filtered[i - offset] = new_intensity;
 	}
+
+    // add flanking peaks by default
+    std::vector<double> leftshifted(filtered);
+    for (size_t i = 0; i + 1 < leftshifted.size(); ++i) {
+        leftshifted[i] = leftshifted[i + 1] * 0.5;
+    }
+    leftshifted[leftshifted.size() - 1] = 0;
+    std::vector<double> rightshifted(filtered);
+    for (int i = int(rightshifted.size()) - 1; i > 0; --i) {
+        rightshifted[i] = rightshifted[i - 1] * 0.5;
+    }
+    rightshifted[0] = 0;
+    for (int i = 0; i < filtered.size(); ++i) {
+        filtered[i] += (leftshifted[i] + rightshifted[i]);
+    }
+
+    // kojak adjustment, round to integers 1 to 128
+    for (int i = 0; i < filtered.size(); ++i) {
+        filtered[i] = round(filtered[i]);
+        if (filtered[i] > 128) {
+            filtered[i] = 128;
+        }
+        if (filtered[i] < -128) {
+            filtered[i] = -128;
+        }
+    }
+
 	return filtered;
 }
 
 double XCorr(const std::vector<double>& spec, double resolution,
 			 const char* sequence, size_t sequence_length,
-			 size_t modified_site, double mass_shift) {
+			 size_t modified_site, double mass_shift, int maximum_charge) {
 	double xcorr = 0;
 	// merge two ion series separately
-	double current_b_ion = PROTON_MASS;
+	double current_b_ion = 0;
 	for (int b_ion_idx = 1; b_ion_idx <= sequence_length; ++b_ion_idx) {
 		current_b_ion += MassTable.at(sequence[b_ion_idx - 1]);
 		if (b_ion_idx - 1 == modified_site) { current_b_ion += mass_shift; }
-		int index = int(current_b_ion / resolution);  // truncate
-		if (index >= spec.size()) { break; }
-		xcorr += spec[index];
+        for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
+            double mz_position = current_b_ion / float(charge_state) + PROTON_MASS;
+            int index = int(mz_position / resolution);  // truncate
+            if (index >= spec.size()) { continue; }
+            xcorr += spec[index];
+        }
 	}
-	double current_y_ion = WATER_MASS + PROTON_MASS;
+	double current_y_ion = WATER_MASS;
 	for (int y_ion_idx = 1; y_ion_idx <= sequence_length; ++y_ion_idx) {
 		current_y_ion += MassTable.at(sequence[sequence_length - y_ion_idx]);
 		if (sequence_length - y_ion_idx == modified_site) { current_y_ion += mass_shift; }
-		int index = int(current_y_ion / resolution);  // truncate
-		if (index >= spec.size()) { break; }
-		xcorr += spec[index];
+        for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
+            double mz_position = current_y_ion / float(charge_state) + PROTON_MASS;
+            int index = int(mz_position / resolution);  // truncate
+            if (index >= spec.size()) { continue; }
+            xcorr += spec[index];
+        }
 	}
 	return xcorr * 0.005;
 }

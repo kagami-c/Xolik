@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(LimXL CXX)
+project(Xolik CXX)
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default Build Type is Release" FORCE)
 
@@ -21,8 +21,8 @@ endif()
 
 set(CMAKE_DEBUG_POSTFIX "d")
 
-add_executable(LimXL src/cli.cpp)
-target_link_libraries(LimXL debug ${CMAKE_SOURCE_DIR}/lib/mzloaderd.lib
+add_executable(Xolik src/cli.cpp)
+target_link_libraries(Xolik debug ${CMAKE_SOURCE_DIR}/lib/mzloaderd.lib
                             debug ${CMAKE_SOURCE_DIR}/lib/ppdatad.lib
                             optimized ${CMAKE_SOURCE_DIR}/lib/mzloader.lib
                             optimized ${CMAKE_SOURCE_DIR}/lib/ppdata.lib)

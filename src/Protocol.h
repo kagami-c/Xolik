@@ -61,13 +61,19 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
         auto end_idx = std::distance(peptide_masses.begin(), last_iter);
 
 		// build scores
-		Scores scores(processed_peaks, precursor_mass, ppdata, generalized_peptides, params.ms2_tolerance, end_idx);
+        int maximum_charge = spectrum_buffer.precursor_charge > 1 ? spectrum_buffer.precursor_charge - 1 : 1;
+        maximum_charge = maximum_charge > 6 ? 6 : maximum_charge;
+		Scores scores(processed_peaks, precursor_mass, ppdata, generalized_peptides, params.ms2_tolerance, end_idx,
+                      maximum_charge);
 
 		// determine threshold
 		double threshold = params.threshold;
 		if (params.enable_rank) {
 			// if scores.size() <= rank, fallback to default_threshold params.threshold
 			threshold = DetermineThreshold(scores, params.rank, params.threshold);
+            if (threshold < params.threshold) {
+                threshold = params.threshold;
+            }
 		}
 
 		// match algorithm
