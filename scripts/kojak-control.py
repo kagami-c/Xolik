@@ -9,10 +9,28 @@ intra = pd.read_csv(sys.argv[1], sep='\t', index_col=False)
 columns = intra.columns.tolist()
 columns[-1] = 'Protein#1'
 columns.append('Protein#2')
+
 intra = pd.read_csv(sys.argv[1], sep='\t', index_col=False, skiprows=[0], header=None)
 intra.columns = columns
+
+inter = pd.read_csv(sys.argv[2], sep='\t', index_col=False, skiprows=[0], header=None)
+inter.columns = columns
+
+data = pd.concat([intra, inter])
+data = data.sort_values(by=['scannr', 'Score'], ascending=False)
+data = data.drop_duplicates(subset='scannr', keep='first')
+
+intra = data[data['Protein#1'] == data['Protein#2']]
 intra = intra.sort_values(by='Score', ascending=False)
 intra = intra.reset_index()
+
+inter = data[data['Protein#1'] != data['Protein#2']]
+inter = inter.sort_values(by='Score', ascending=False)
+inter = inter.reset_index()
+
+#################
+# Intra control
+#################
 
 intra['Decoy'] = intra['Protein#1'].str.startswith('DECOY_') & intra['Protein#2'].str.startswith('DECOY_')
 intra['Decoy'] = intra['Decoy'].astype(int)
@@ -32,20 +50,10 @@ intra = intra.drop(['index', 'Decoy', 'CumDecoy', 'Total', 'FDR'], axis=1)
 filtered = intra[(~intra['Protein#1'].str.startswith('DECOY_')) & (~intra['Protein#2'].str.startswith('DECOY_'))]
 filtered.to_csv(sys.argv[1] + '.controlled.csv', index=False)
 
-###########
-# Inter
-###########
+#################
+# Inter control
+#################
 
-inter = pd.read_csv(sys.argv[2], sep='\t', index_col=False)
-columns = inter.columns.tolist()
-columns[-1] = 'Protein#1'
-columns.append('Protein#2')
-inter = pd.read_csv(sys.argv[2], sep='\t', index_col=False, skiprows=[0], header=None)
-inter.columns = columns
-inter = inter.sort_values(by='Score', ascending=False)
-inter = inter.reset_index()
-
-# re-control inter results
 inter['U'] = ((inter['Protein#1'].str.startswith('DECOY_') & ~inter['Protein#2'].str.startswith('DECOY_'))
               | (~inter['Protein#1'].str.startswith('DECOY_') & inter['Protein#2'].str.startswith('DECOY_')))
 inter['F'] = inter['Protein#1'].str.startswith('DECOY_') & inter['Protein#2'].str.startswith('DECOY_')

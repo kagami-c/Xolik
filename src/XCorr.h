@@ -82,17 +82,6 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
         filtered[i] += (leftshifted[i] + rightshifted[i]);
     }
 
-    // kojak adjustment, round to integers 1 to 128
-    for (int i = 0; i < filtered.size(); ++i) {
-        filtered[i] = round(filtered[i]);
-        if (filtered[i] > 128) {
-            filtered[i] = 128;
-        }
-        if (filtered[i] < -128) {
-            filtered[i] = -128;
-        }
-    }
-
 	return filtered;
 }
 
