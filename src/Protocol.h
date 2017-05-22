@@ -53,10 +53,12 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
         // preprocess experimental spectrum
         auto precursor_mass = (spectrum_buffer.precursor_mz - PROTON_MASS) * spectrum_buffer.precursor_charge;
         auto processed_peaks = Preprocess(spectrum_buffer.peaks, params.ms2_tolerance);
-        double tolerance_in_da = precursor_mass * params.ms1_tolerance / 1000000;
+        //double tolerance_in_da = precursor_mass * params.ms1_tolerance / 1000000;
+        double left_tol = precursor_mass - precursor_mass / (1 + params.ms1_tolerance / 1000000);
+        double right_tol = precursor_mass / (1 - params.ms1_tolerance / 1000000) - precursor_mass;
 
         // calculate end_idx
-        auto max_allowed_peptide_mass = precursor_mass - params.xlmass - params.min_allowed_mass + tolerance_in_da;
+        auto max_allowed_peptide_mass = precursor_mass - params.xlmass - params.min_allowed_mass + right_tol;
         auto last_iter = std::upper_bound(peptide_masses.begin(), peptide_masses.end(), max_allowed_peptide_mass);
         auto end_idx = std::distance(peptide_masses.begin(), last_iter);
 
@@ -79,10 +81,10 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
         // match algorithm
         std::tuple<CandIdx, CandIdx, Score> max_match;
         if (params.use_LimXL_match) {
-            max_match = LimXLMatch(peptide_masses, scores, precursor_mass, params.xlmass, tolerance_in_da, threshold);
+            max_match = LimXLMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol);
         }
         else {
-            max_match = NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, tolerance_in_da, threshold);
+            max_match = NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol);
         }
         if (std::get<0>(max_match) == scores.size() || std::get<1>(max_match) == scores.size()) {
             continue;

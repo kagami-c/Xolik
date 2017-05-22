@@ -11,9 +11,10 @@ typedef double Score;
 typedef double Mass;
 
 std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses, Scores& scores,
-                                               double precursor_mass, double xlinker_mass, double match_tolerance, double threshold) {
+                                               double precursor_mass, double xlinker_mass, double threshold,
+                                               double left_tol, double right_tol) {
     auto global_max_info = std::make_tuple(scores.size(), scores.size(), 0.0);  // out of range means no
-    auto max_allowed = (precursor_mass - xlinker_mass + match_tolerance) / 2;
+    auto max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
     auto last_iter = std::upper_bound(masses.begin(), masses.begin() + scores.size(), max_allowed);
     auto last_idx = std::distance(masses.begin(), last_iter);
 
@@ -24,8 +25,8 @@ std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses
     while (forward_idx < last_idx) {
 
         auto alpha_mass = masses[forward_idx];
-        auto lower_bound = precursor_mass - alpha_mass - xlinker_mass - match_tolerance;
-        auto upper_bound = precursor_mass - alpha_mass - xlinker_mass + match_tolerance;
+        auto lower_bound = precursor_mass - alpha_mass - xlinker_mass - left_tol;
+        auto upper_bound = precursor_mass - alpha_mass - xlinker_mass + right_tol;
 
         // Step 1: move backward_end and make sure elements in the front of deque are
         // within the allowed mass range, backward_end included
@@ -67,17 +68,18 @@ std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses
 }
 
 std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& masses, Scores& scores,
-                                               double precursor_mass, double xlinker_mass, double match_tolerance, double threshold) {
+                                               double precursor_mass, double xlinker_mass, double threshold,
+                                               double left_tol, double right_tol) {
     auto global_max_info = std::make_tuple(scores.size(), scores.size(), 0.0);  // out of range means no
-    auto max_allowed = (precursor_mass - xlinker_mass + match_tolerance) / 2;
+    auto max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
     auto last_iter = std::upper_bound(masses.begin(), masses.begin() + scores.size(), max_allowed);
     auto last_idx = std::distance(masses.begin(), last_iter);
 
     for (auto i = 0; i < last_idx; ++i) {
 
         auto alpha_mass = masses[i];
-        auto lower_bound = precursor_mass - alpha_mass - xlinker_mass - match_tolerance;
-        auto upper_bound = precursor_mass - alpha_mass - xlinker_mass + match_tolerance;
+        auto lower_bound = precursor_mass - alpha_mass - xlinker_mass - left_tol;
+        auto upper_bound = precursor_mass - alpha_mass - xlinker_mass + right_tol;
         auto start = std::lower_bound(masses.begin(), masses.begin() + scores.size(), lower_bound);
         auto end = std::upper_bound(masses.begin(), masses.begin() + scores.size(), upper_bound);
         auto start_idx = std::distance(masses.begin(), start);
