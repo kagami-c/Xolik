@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(Xolik CXX)
+set(CMAKE_CXX_STANDARD 14)
 
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Default Build Type is Release" FORCE)
 
@@ -22,7 +23,14 @@ endif()
 set(CMAKE_DEBUG_POSTFIX "d")
 
 add_executable(Xolik src/cli.cpp)
-target_link_libraries(Xolik debug ${CMAKE_SOURCE_DIR}/lib/mzloaderd.lib
-                            debug ${CMAKE_SOURCE_DIR}/lib/ppdatad.lib
-                            optimized ${CMAKE_SOURCE_DIR}/lib/mzloader.lib
-                            optimized ${CMAKE_SOURCE_DIR}/lib/ppdata.lib)
+if (MSVC)
+    target_link_libraries(Xolik debug ${CMAKE_SOURCE_DIR}/lib/mzloaderd.lib
+                                debug ${CMAKE_SOURCE_DIR}/lib/ppdatad.lib
+                                optimized ${CMAKE_SOURCE_DIR}/lib/mzloader.lib
+                                optimized ${CMAKE_SOURCE_DIR}/lib/ppdata.lib)
+elseif(UNIX)
+    target_link_libraries(Xolik debug ${CMAKE_SOURCE_DIR}/lib/libmzloader.a
+                                debug ${CMAKE_SOURCE_DIR}/lib/libppdata.a
+                                optimized ${CMAKE_SOURCE_DIR}/lib/libmzloader.a
+                                optimized ${CMAKE_SOURCE_DIR}/lib/libppdata.a)
+endif()
