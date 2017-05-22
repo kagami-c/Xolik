@@ -42,19 +42,19 @@ void WriteResults(const char* output_path, const std::vector<Record>& records,
 Params ParseArguments(int argc, const char** argv) {
     using StringArg = TCLAP::ValueArg<std::string>;
     using DoubleArg = TCLAP::ValueArg<double>;
-    TCLAP::CmdLine cmd("LimXL - Linear-time matching algorithm for searching cross-linked peptides", ' ', "beta");
+    TCLAP::CmdLine cmd("Xolik - A linear-time algorithm for searching cross-linked peptides", ' ', "beta");
     TCLAP::ValueArg<int> rank_arg("", "rank", "Rank threshold, used together with --enable_rank", false, 1000, "Rank", cmd);
     TCLAP::SwitchArg enable_rank_arg("", "enable_rank", "Enable rank-based filter", cmd);
     DoubleArg thresh_arg("", "threshold", "Score threshold", false, 0.0001, "Xcorr", cmd);
     DoubleArg ms2_tol_arg("", "ms2tol", "MS2 tolerance", false, 0.5, "Da", cmd);
     DoubleArg ms1_tol_arg("", "ms1tol", "MS1 tolerance", false, 50, "PPM", cmd);
-    DoubleArg xlmass_arg("", "xlmass", "Cross linker mass", false, 138.0680796, "MASS", cmd);
+    DoubleArg xlmass_arg("", "xlmass", "Cross linker mass", false, 138.0680796, "Da", cmd);
     TCLAP::ValueArg<char> xlsite_arg("", "xlsite", "Cross-linked site", false, 'K', "AA", cmd);
-    DoubleArg max_mass_arg("", "max", "Maximal peptide mass", false, 5000, "Da", cmd);
-    DoubleArg min_mass_arg("", "min", "Minimal peptide mass", false, 1000, "Da", cmd);
-    TCLAP::ValueArg<int> miss_cleavage_arg("", "miss", "Maximal miss cleavage", false, 2, "INT", cmd);
+    DoubleArg max_mass_arg("", "max", "Maximum peptide mass", false, 5000, "Da", cmd);
+    DoubleArg min_mass_arg("", "min", "Minimum peptide mass", false, 1000, "Da", cmd);
+    TCLAP::ValueArg<int> miss_cleavage_arg("", "miss", "Maximum miss cleavage", false, 2, "INT", cmd);
     TCLAP::SwitchArg disable_decoy_arg("", "disable_decoy", "Disable automatically decoy protein generation", cmd);
-    TCLAP::SwitchArg disable_LimXL_arg("", "disable_LimXL", "Disable LimXL algorithm", cmd);
+    TCLAP::SwitchArg disable_linear_arg("", "disable_linear", "Disable linear-time algorithm, fallback to quadratic-time", cmd);
     StringArg output_path_arg("o", "output", "Output path", true, "", "FILE", cmd);
     StringArg mzfile_path_arg("s", "spectrum", "Mass spectrum file", true, "", "mzXML/mzML", cmd);
     StringArg database_path_arg("d", "database", "Database file", true, "", "FASTA", cmd);
@@ -64,7 +64,7 @@ Params ParseArguments(int argc, const char** argv) {
     params.database_path = database_path_arg.getValue();
     params.mzfile_path = mzfile_path_arg.getValue();
     params.output_path = output_path_arg.getValue();
-    params.use_LimXL_match = disable_LimXL_arg.getValue() ? false : true;
+    params.use_LimXL_match = disable_linear_arg.getValue() ? false : true;
     params.append_decoy = disable_decoy_arg.getValue() ? false : true;
     params.max_miss_cleavage = miss_cleavage_arg.getValue();
     params.min_allowed_mass = min_mass_arg.getValue();
@@ -81,15 +81,15 @@ Params ParseArguments(int argc, const char** argv) {
 }
 
 void PrintSettings(const Params& params) {
-    printf("LimXL ver.beta (%s, %s)\n", __DATE__, __TIME__);
+    printf("Xolik ver.beta (%s, %s)\n", __DATE__, __TIME__);
     printf("Database:              %s\n", params.database_path.c_str());
     printf("Spectra:               %s\n", params.mzfile_path.c_str());
     printf("Output path:           %s\n", params.output_path.c_str());
-    printf("Use LimXL algorithm:   %s\n", params.use_LimXL_match ? "true" : "false");
+    printf("Use linear-time mode:  %s\n", params.use_LimXL_match ? "true" : "false");
     printf("Append decoy:          %s\n", params.append_decoy ? "true" : "false");
-    printf("Maximal miss cleavage: %d\n", params.max_miss_cleavage);
-    printf("Minimal peptide mass:  %.2f Da\n", params.min_allowed_mass);
-    printf("Maximal peptide mass:  %.2f Da\n", params.max_allowed_mass);
+    printf("Maximum miss cleavage: %d\n", params.max_miss_cleavage);
+    printf("Minimum peptide mass:  %.2f Da\n", params.min_allowed_mass);
+    printf("Maximum peptide mass:  %.2f Da\n", params.max_allowed_mass);
     printf("Cross-linked site:     %c\n", params.xlsite);
     printf("Cross linker mass:     %f Da\n", params.xlmass);
     printf("MS1 tolerance:         %.2f ppm\n", params.ms1_tolerance);
