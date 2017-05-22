@@ -20,13 +20,13 @@ inline std::vector<size_t> FindLinkSites(char xlsite, const char* sequence, size
 }
 
 double DetermineThreshold(Scores scores, int rank, double default_threshold) {
-	if (scores.size() <= rank) { return default_threshold; }
-	std::vector<double> local_scores(scores.size(), 0);
-	for (int i = 0; i < scores.size(); ++i) {
-		local_scores[i] = scores[i];
-	}
-	std::nth_element(local_scores.begin(), local_scores.begin() + rank - 1, local_scores.end(), std::greater<double>());
-	return local_scores[rank - 1];
+    if (scores.size() <= rank) { return default_threshold; }
+    std::vector<double> local_scores(scores.size(), 0);
+    for (int i = 0; i < scores.size(); ++i) {
+        local_scores[i] = scores[i];
+    }
+    std::nth_element(local_scores.begin(), local_scores.begin() + rank - 1, local_scores.end(), std::greater<double>());
+    return local_scores[rank - 1];
 }
 
 // The tasks of the caller of Search():
@@ -38,12 +38,12 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
     std::vector<Record> results;
 
     std::vector<std::pair<size_t /*peptide idx*/, size_t /*site idx*/>> generalized_peptides;  // peptide site combinations
-	std::vector<double> peptide_masses;  // a separate peptide mass array, already sorted
+    std::vector<double> peptide_masses;  // a separate peptide mass array, already sorted
     for (auto i = 0; i < ppdata.size(); ++i) {
         auto sites = FindLinkSites(params.xlsite, ppdata[i].sequence, ppdata[i].sequence_length);
         for (auto site : sites) {
             generalized_peptides.push_back(std::make_pair(i, site));
-			peptide_masses.push_back(ppdata[i].mass);
+            peptide_masses.push_back(ppdata[i].mass);
         }
     }
 
@@ -57,29 +57,29 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
 
         // calculate end_idx
         auto max_allowed_peptide_mass = precursor_mass - params.xlmass - params.min_allowed_mass + tolerance_in_da;
-		auto last_iter = std::upper_bound(peptide_masses.begin(), peptide_masses.end(), max_allowed_peptide_mass);
+        auto last_iter = std::upper_bound(peptide_masses.begin(), peptide_masses.end(), max_allowed_peptide_mass);
         auto end_idx = std::distance(peptide_masses.begin(), last_iter);
 
-		// build scores
+        // build scores
         int maximum_charge = spectrum_buffer.precursor_charge > 1 ? spectrum_buffer.precursor_charge - 1 : 1;
         maximum_charge = maximum_charge > 6 ? 6 : maximum_charge;
-		Scores scores(processed_peaks, precursor_mass, ppdata, generalized_peptides, params.ms2_tolerance, end_idx,
+        Scores scores(processed_peaks, precursor_mass, ppdata, generalized_peptides, params.ms2_tolerance, end_idx,
                       maximum_charge);
 
-		// determine threshold
-		double threshold = params.threshold;
-		if (params.enable_rank) {
-			// if scores.size() <= rank, fallback to default_threshold params.threshold
-			threshold = DetermineThreshold(scores, params.rank, params.threshold);
+        // determine threshold
+        double threshold = params.threshold;
+        if (params.enable_rank) {
+            // if scores.size() <= rank, fallback to default_threshold params.threshold
+            threshold = DetermineThreshold(scores, params.rank, params.threshold);
             if (threshold < params.threshold) {
                 threshold = params.threshold;
             }
-		}
+        }
 
-		// match algorithm
+        // match algorithm
         std::tuple<CandIdx, CandIdx, Score> max_match;
         if (params.use_LimXL_match) {
-			max_match = LimXLMatch(peptide_masses, scores, precursor_mass, params.xlmass, tolerance_in_da, threshold);
+            max_match = LimXLMatch(peptide_masses, scores, precursor_mass, params.xlmass, tolerance_in_da, threshold);
         }
         else {
             max_match = NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, tolerance_in_da, threshold);

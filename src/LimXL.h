@@ -10,13 +10,13 @@ typedef size_t CandIdx;
 typedef double Score;
 typedef double Mass;
 
-std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses, Scores& scores, 
-											   double precursor_mass, double xlinker_mass, double match_tolerance, double threshold) {
+std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses, Scores& scores,
+                                               double precursor_mass, double xlinker_mass, double match_tolerance, double threshold) {
     auto global_max_info = std::make_tuple(scores.size(), scores.size(), 0.0);  // out of range means no
     auto max_allowed = (precursor_mass - xlinker_mass + match_tolerance) / 2;
-	auto last_iter = std::upper_bound(masses.begin(), masses.begin() + scores.size(), max_allowed);
+    auto last_iter = std::upper_bound(masses.begin(), masses.begin() + scores.size(), max_allowed);
     auto last_idx = std::distance(masses.begin(), last_iter);
-    
+
     int forward_idx = 0;
     int backward_front = scores.size();
     int backward_end = scores.size() - 1;
@@ -67,10 +67,10 @@ std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses
 }
 
 std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& masses, Scores& scores,
-											   double precursor_mass, double xlinker_mass, double match_tolerance, double threshold) {
+                                               double precursor_mass, double xlinker_mass, double match_tolerance, double threshold) {
     auto global_max_info = std::make_tuple(scores.size(), scores.size(), 0.0);  // out of range means no
     auto max_allowed = (precursor_mass - xlinker_mass + match_tolerance) / 2;
-	auto last_iter = std::upper_bound(masses.begin(), masses.begin() + scores.size(), max_allowed);
+    auto last_iter = std::upper_bound(masses.begin(), masses.begin() + scores.size(), max_allowed);
     auto last_idx = std::distance(masses.begin(), last_iter);
 
     for (auto i = 0; i < last_idx; ++i) {
@@ -78,8 +78,8 @@ std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& masses
         auto alpha_mass = masses[i];
         auto lower_bound = precursor_mass - alpha_mass - xlinker_mass - match_tolerance;
         auto upper_bound = precursor_mass - alpha_mass - xlinker_mass + match_tolerance;
-		auto start = std::lower_bound(masses.begin(), masses.begin() + scores.size(), lower_bound);
-		auto end = std::upper_bound(masses.begin(), masses.begin() + scores.size(), upper_bound);
+        auto start = std::lower_bound(masses.begin(), masses.begin() + scores.size(), lower_bound);
+        auto end = std::upper_bound(masses.begin(), masses.begin() + scores.size(), upper_bound);
         auto start_idx = std::distance(masses.begin(), start);
         auto end_idx = std::distance(masses.begin(), end);
 

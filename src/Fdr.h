@@ -13,7 +13,7 @@ inline bool IsDecoy(const char* protein_name) {
 }
 
 std::vector<double> CalculateFDR(std::vector<Record>& records, const PPData& ppdata) {
-    std::stable_sort(records.begin(), records.end(), 
+    std::stable_sort(records.begin(), records.end(),
                      [](const auto& one, const auto& another) {
                          return one.score > another.score;
                      });

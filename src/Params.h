@@ -4,12 +4,12 @@
 
 // simply a struct storing all we need for a run of a search
 struct Params {
-	// required 
+    // required
     std::string database_path = "";
     std::string mzfile_path = "";
     std::string output_path = "";
 
-	// optional
+    // optional
     char xlsite = 'K';
     double xlmass = 138.0680796;
 
@@ -23,10 +23,10 @@ struct Params {
     bool append_decoy = true;
     bool use_LimXL_match = true;
 
-	// filter settings
-	double threshold = 0.0001;
-	bool enable_rank = false;
-	int rank = 1000;
+    // filter settings
+    double threshold = 0.0001;
+    bool enable_rank = false;
+    int rank = 1000;
 };
 
 const std::unordered_map<char, double> MassTable = {
