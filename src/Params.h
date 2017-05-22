@@ -40,7 +40,9 @@ const std::unordered_map<char, double> MassTable = {
 
 // internal mass table
 const double PROTON_MASS = 1.00727;
-const double WATER_MASS = 18.01528;
+const double HYDROGEN_MASS = 1.00782;
+const double OXYGEN_MASS = 15.99491;
+const double WATER_MASS = OXYGEN_MASS + HYDROGEN_MASS + HYDROGEN_MASS;
 
 // data interface, as the output of Search() routine
 struct Record {

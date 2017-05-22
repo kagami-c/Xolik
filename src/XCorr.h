@@ -11,14 +11,16 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
     auto min_mass = peaks[0].first;
     auto max_mass = peaks[peaks.size() - 1].first;
     const auto num_step = 10;
-    auto step_unit = (max_mass - min_mass) / 10;
+    // auto step_unit = (max_mass - min_mass) / 10;
+    int step_unit = vector_size / 10 + 1;
 
     int start = 0;
     int end = 0;  // exclude
     int step = 0;
     do {
-        auto lower_bound = min_mass + step * step_unit;
-        auto upper_bound = lower_bound + step_unit;
+        // auto lower_bound = min_mass + step * step_unit;
+        double lower_bound = step * step_unit * resolution;
+        auto upper_bound = lower_bound + step_unit * resolution;
         start = end;
         while (end < peaks.size() && peaks[end].first <= upper_bound) {
             ++end;
