@@ -8,11 +8,19 @@
 #include "XCorr.h"
 #include "LimXL.h"
 #include "Scores.h"
+#include "Evalue.h"
 
-inline std::vector<size_t> FindLinkSites(char xlsite, const char* sequence, size_t sequence_length) {
+inline std::vector<size_t> FindLinkSites(char xlsite, const char* sequence, size_t sequence_length, 
+                                         size_t offset, size_t protein_length) {  
+                                         // for xlsite == K, being cross-linked should not be digested
     std::vector<size_t> sites;
     for (auto i = 0; i < sequence_length; ++i) {
         if (sequence[i] == xlsite) {
+            // protect K & R being digested if it is cross-linked
+            if ((xlsite == 'K' || xlsite == 'R') && i + 1 == sequence_length // last char of the sequence
+                    && offset + sequence_length < protein_length) {  // and is not the end of the whole protein
+                break;
+            }
             sites.push_back(i);
         }
     }
@@ -40,7 +48,7 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
     std::vector<std::pair<size_t /*peptide idx*/, size_t /*site idx*/>> generalized_peptides;  // peptide site combinations
     std::vector<double> peptide_masses;  // a separate peptide mass array, already sorted
     for (auto i = 0; i < ppdata.size(); ++i) {
-        auto sites = FindLinkSites(params.xlsite, ppdata[i].sequence, ppdata[i].sequence_length);
+        auto sites = FindLinkSites(params.xlsite, ppdata[i].sequence, ppdata[i].sequence_length, ppdata[i].offset, ppdata[i].protein->sequence_length);
         for (auto site : sites) {
             generalized_peptides.push_back(std::make_pair(i, site));
             peptide_masses.push_back(ppdata[i].mass);
@@ -80,18 +88,33 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
 
         // match algorithm
         std::tuple<CandIdx, CandIdx, Score> max_match;
+        std::vector<double> collected_scores;  // for evalue estimation
         if (params.use_LimXL_match) {
             max_match = LimXLMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol);
         }
         else {
-            max_match = NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol);
+            max_match = NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol, collected_scores);
         }
         if (std::get<0>(max_match) == scores.size() || std::get<1>(max_match) == scores.size()) {
             continue;
         }
+        double report_score = std::get<2>(max_match);  // raw Xcorr score
+
+        // estimate evalue
+        if (params.use_E_value) {
+            double additional_tol = 0.0;
+            while (collected_scores.size() < params.histogram_size && additional_tol + std::max(left_tol, right_tol) <= 20.0) {
+                collected_scores.clear();
+                additional_tol += 1.0;
+                NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold,
+                           additional_tol + left_tol, additional_tol + right_tol, collected_scores);
+            }
+            double evalue = CalculateEValue(std::get<2>(max_match), collected_scores);
+            report_score = -log10(evalue);  // - log 10 evalue to make it compatible with FDR control
+        }
 
         results.push_back({ spectrum_buffer.scan_num,  // SpecIdx
-                            std::get<2>(max_match),  // Score
+                            report_score,  // Score  
                             generalized_peptides[std::get<0>(max_match)].first,  // PeptIdx
                             generalized_peptides[std::get<0>(max_match)].second,  // link site
                             generalized_peptides[std::get<1>(max_match)].first,  // PeptIdx

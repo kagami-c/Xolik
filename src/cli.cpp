@@ -43,8 +43,11 @@ Params ParseArguments(int argc, const char** argv) {
     using StringArg = TCLAP::ValueArg<std::string>;
     using DoubleArg = TCLAP::ValueArg<double>;
     TCLAP::CmdLine cmd("Xolik - A linear-time algorithm for searching cross-linked peptides", ' ', "beta");
+    TCLAP::ValueArg<int> histogram_size_arg("", "histogram_size", "Minimum data points required to build histogram for E-value estimation", 
+                                            false, 15000, "SIZE", cmd);
+    TCLAP::SwitchArg enable_evalue_arg("", "use_evalue", "Estimate E-value for XCorr, reported as -log10(evalue)", cmd);
     TCLAP::ValueArg<int> rank_arg("", "rank", "Rank threshold, used together with --enable_rank", false, 1000, "Rank", cmd);
-    TCLAP::SwitchArg enable_rank_arg("", "enable_rank", "Enable rank-based filter", cmd);
+    TCLAP::SwitchArg enable_rank_arg("", "enable_rank", "Enable rank-based filter on single peptide", cmd);
     DoubleArg thresh_arg("", "threshold", "Score threshold", false, 0.0001, "Xcorr", cmd);
     DoubleArg ms2_tol_arg("", "ms2tol", "MS2 tolerance", false, 0.5, "Da", cmd);
     DoubleArg ms1_tol_arg("", "ms1tol", "MS1 tolerance", false, 50, "PPM", cmd);
@@ -76,6 +79,8 @@ Params ParseArguments(int argc, const char** argv) {
     params.threshold = thresh_arg.getValue();
     params.enable_rank = enable_rank_arg.getValue();
     params.rank = rank_arg.getValue();
+    params.use_E_value = enable_evalue_arg.getValue();
+    params.histogram_size = histogram_size_arg.getValue();
 
     return params;
 }
@@ -97,6 +102,8 @@ void PrintSettings(const Params& params) {
     printf("Score threshold:       %.4f\n", params.threshold);
     printf("Enable rank filter:    %s\n", params.enable_rank ? "true" : "false");
     printf("Rank threshold:        %d\n", params.rank);
+    printf("Use E-value:           %s\n", params.use_E_value ? "true" : "false");
+    printf("Histogram size:        %d\n", params.histogram_size);
 }
 
 int main(int argc, const char** argv) {

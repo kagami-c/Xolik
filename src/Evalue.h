@@ -30,8 +30,7 @@ bool LeastSquares(const std::vector<double>& y, const std::vector<double>& x,
     return true;
 }
 
-// given a list of visited scores, generate the histogram and calculate the e value
-// we don't require that scores is sorted
+// Comet's estimation procedure
 double CalculateEValue(double target, const std::vector<double>& scores) {
     using std::vector;
 
@@ -101,14 +100,13 @@ double CalculateEValue(double target, const std::vector<double>& scores) {
             y.push_back(log10survival[j]);
         }
     }
-    while (!LeastSquares(y, x, a, b) || (start_idx > 0 && b >= 0)) {  //
+    while (!LeastSquares(y, x, a, b) || (start_idx > 0 && b >= 0)) {
         --start_idx;
         x.push_back(start_idx);
         y.push_back(log10survival[start_idx]);
     }
 
     // calculate e value
-    double evalue = pow(10.0, a + b * target);
+    double evalue = pow(10.0, a + b * int(target * 10.0 + 0.05));
     return evalue > 999.0 ? 999.0 : evalue;
 }
-
