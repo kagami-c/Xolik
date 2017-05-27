@@ -111,12 +111,12 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
             while (collected_scores.size() < params.histogram_size && additional_tol + std::max(left_tol, right_tol) <= 20.0) {
                 additional_tol += 1.0;
                 NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold,
-                           additional_tol + left_tol, additional_tol - 1.0 + left_tol, collected_scores, true, params.histogram_size);
+                           additional_tol + left_tol, -(additional_tol - 1.0 + left_tol), collected_scores, true, params.histogram_size);
                 if (collected_scores.size() >= params.histogram_size) {
                     break;
                 }
                 NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold,
-                           right_tol + additional_tol - 1.0, right_tol + additional_tol, collected_scores, true, params.histogram_size);
+                           -(right_tol + additional_tol - 1.0), right_tol + additional_tol, collected_scores, true, params.histogram_size);
             }
 
             double evalue = CalculateEValue(std::get<2>(max_match), collected_scores);
