@@ -93,7 +93,8 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
             max_match = LimXLMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol);
         }
         else {
-            max_match = NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol, collected_scores);
+            max_match = NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol, 
+                                   collected_scores, false, 0);
         }
         if (std::get<0>(max_match) == scores.size() || std::get<1>(max_match) == scores.size()) {
             continue;
@@ -107,7 +108,8 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
                 collected_scores.clear();
                 additional_tol += 1.0;
                 NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold,
-                           additional_tol + left_tol, additional_tol + right_tol, collected_scores);
+                           additional_tol + left_tol, additional_tol + right_tol, 
+                           collected_scores, true, params.histogram_size);
             }
             double evalue = CalculateEValue(std::get<2>(max_match), collected_scores);
             report_score = -log10(evalue);  // - log 10 evalue to make it compatible with FDR control

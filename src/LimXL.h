@@ -70,7 +70,7 @@ std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses
 std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& masses, Scores& scores,
                                                double precursor_mass, double xlinker_mass, double threshold,
                                                double left_tol, double right_tol,
-                                               std::vector<double>& collected_scores) {
+                                               std::vector<double>& collected_scores, bool collect, int collect_size) {
     auto global_max_info = std::make_tuple(scores.size(), scores.size(), 0.0);  // out of range means no
     auto max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
     auto last_iter = std::upper_bound(masses.begin(), masses.begin() + scores.size(), max_allowed);
@@ -89,7 +89,15 @@ std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& masses
         if (start_idx == end_idx) { continue; }
         auto local_max_idx = end_idx - 1;
         for (int j = end_idx - 1; j >= start_idx; --j) {
-            collected_scores.push_back(scores[i] + scores[j]);
+
+            // collect mode
+            if (collect) {
+                collected_scores.push_back(scores[i] + scores[j]);
+                if (collected_scores.size() >= collect_size) {
+                    return global_max_info;
+                }
+            }
+
             if (scores[j] > scores[local_max_idx]) {
                 local_max_idx = j;
             }
