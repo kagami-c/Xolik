@@ -103,14 +103,22 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
 
         // estimate evalue
         if (params.use_E_value) {
+            // GARBAGE, I really don't understand why PEOPLE will be proud of features using such an STUPID solution
+            // Both solution and the value towards this solution are GARBAGE.
             double additional_tol = 0.0;
+            NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold,
+                       left_tol, right_tol, collected_scores, true, params.histogram_size);
             while (collected_scores.size() < params.histogram_size && additional_tol + std::max(left_tol, right_tol) <= 20.0) {
-                collected_scores.clear();
                 additional_tol += 1.0;
                 NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold,
-                           additional_tol + left_tol, additional_tol + right_tol, 
-                           collected_scores, true, params.histogram_size);
+                           additional_tol + left_tol, additional_tol - 1.0 + left_tol, collected_scores, true, params.histogram_size);
+                if (collected_scores.size() >= params.histogram_size) {
+                    break;
+                }
+                NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold,
+                           right_tol + additional_tol - 1.0, right_tol + additional_tol, collected_scores, true, params.histogram_size);
             }
+
             double evalue = CalculateEValue(std::get<2>(max_match), collected_scores);
             report_score = -log10(evalue);  // - log 10 evalue to make it compatible with FDR control
         }
