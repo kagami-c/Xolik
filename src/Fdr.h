@@ -1,5 +1,3 @@
-// Copyright (C) 2016
-
 #pragma once
 
 #include <vector>

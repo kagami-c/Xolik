@@ -36,6 +36,7 @@ public:
            unsigned max_miss_cleavage, double min_mass, double max_mass);
     PPData(const char* filename)
            : PPData(filename, false, EnzymeType::Trypsin, 0, 600.0, 5000.0) {}
+    PPData(const PPData& ppdata);
     ~PPData();
 
     // access methods

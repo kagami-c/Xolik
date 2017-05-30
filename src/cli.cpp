@@ -45,7 +45,9 @@ Params ParseArguments(int argc, const char** argv) {
     TCLAP::CmdLine cmd("Xolik - A linear-time algorithm for searching cross-linked peptides", ' ', "beta");
     TCLAP::ValueArg<int> histogram_size_arg("", "histogram_size", "Minimum data points required to build histogram for E-value estimation", 
                                             false, 15000, "SIZE", cmd);
-    TCLAP::SwitchArg enable_evalue_arg("", "use_evalue", "Estimate E-value for XCorr, reported as -log10(evalue)", cmd);
+    TCLAP::ValueArg<int> thread_arg("", "thread", "Number of threads for parallel computing, used together with --parallel", false, 4, "INT", cmd);
+    TCLAP::SwitchArg parallel_arg("", "parallel", "Enable parallel computing by multi-threading", cmd);
+    TCLAP::SwitchArg noevalue_arg("", "noevalue", "Disable E-value estimation, E-value will be reported as -log10(evalue)", cmd);
     TCLAP::ValueArg<int> rank_arg("", "rank", "Rank threshold, used together with --enable_rank", false, 1000, "Rank", cmd);
     TCLAP::SwitchArg enable_rank_arg("", "enable_rank", "Enable rank-based filter on single peptide", cmd);
     DoubleArg thresh_arg("", "threshold", "Score threshold", false, 0.0001, "Xcorr", cmd);
@@ -79,8 +81,10 @@ Params ParseArguments(int argc, const char** argv) {
     params.threshold = thresh_arg.getValue();
     params.enable_rank = enable_rank_arg.getValue();
     params.rank = rank_arg.getValue();
-    params.use_E_value = enable_evalue_arg.getValue();
+    params.use_E_value = noevalue_arg.getValue() ? false : true;
     params.histogram_size = histogram_size_arg.getValue();
+    params.enable_parallel = parallel_arg.getValue();
+    params.thread = thread_arg.getValue();
 
     return params;
 }
@@ -104,6 +108,8 @@ void PrintSettings(const Params& params) {
     printf("Rank threshold:        %d\n", params.rank);
     printf("Use E-value:           %s\n", params.use_E_value ? "true" : "false");
     printf("Histogram size:        %d\n", params.histogram_size);
+    printf("Parallel computing:    %s\n", params.enable_parallel ? "true" : "false");
+    printf("Number of threads:     %d\n", params.thread);
 }
 
 int main(int argc, const char** argv) {

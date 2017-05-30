@@ -23,8 +23,10 @@ struct Params {
     bool append_decoy = true;
     bool use_LimXL_match = true;
 
-    bool use_E_value = false;
+    bool use_E_value = true;
     int histogram_size = 15000;
+    bool enable_parallel = false;
+    int thread = 4;
 
     // filter settings
     double threshold = 0.0001;
