@@ -43,10 +43,10 @@ Params ParseArguments(int argc, const char** argv) {
     using StringArg = TCLAP::ValueArg<std::string>;
     using DoubleArg = TCLAP::ValueArg<double>;
     TCLAP::CmdLine cmd("Xolik - A linear-time algorithm for searching cross-linked peptides", ' ', "beta");
-    TCLAP::ValueArg<int> histogram_size_arg("", "histogram_size", "Minimum data points required to build histogram for E-value estimation", 
-                                            false, 15000, "SIZE", cmd);
     TCLAP::ValueArg<int> thread_arg("", "thread", "Number of threads for parallel computing, used together with --parallel", false, 4, "INT", cmd);
     TCLAP::SwitchArg parallel_arg("", "parallel", "Enable parallel computing by multi-threading", cmd);
+    TCLAP::ValueArg<int> histogram_size_arg("", "histogram_size", "Minimum data points required to build histogram for E-value estimation", 
+                                            false, 15000, "SIZE", cmd);
     TCLAP::SwitchArg noevalue_arg("", "noevalue", "Disable E-value estimation, E-value will be reported as -log10(evalue)", cmd);
     TCLAP::ValueArg<int> rank_arg("", "rank", "Rank threshold, used together with --enable_rank", false, 1000, "Rank", cmd);
     TCLAP::SwitchArg enable_rank_arg("", "enable_rank", "Enable rank-based filter on single peptide", cmd);
