@@ -7,7 +7,7 @@ Please ensure that the following packages exist.
 - pandas
 
 To run Xolik, use the following commands.
-```bash
+```
 ./Xolik -d db-filename.fasta -s msdata-filename.mzXML -o output-filename.csv --ms1tol 5 --ms2tol 0.02
 python splitctrl.py output-filename.csv
 ```
@@ -21,7 +21,7 @@ Use `./Xolik --help` for all available options.
 ## Publications
 J. Dai\*, W. Jiang\*, F. Yu\* and W. Yu,
 **"Xolik: finding cross-linked peptides with maximum paired scores in linear time"**,
-in preparation. *Joint first authors.
+in preparation. *Contributed equally to this work.
 
 ## License
 BSD License
