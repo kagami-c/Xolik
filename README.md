@@ -2,11 +2,17 @@
 Finding cross-linked peptides with maximum paired scores in linear time
 
 ## Usage
+Please ensure that the following packages exist.
+- Python 2.7
+- pandas
+
+To run Xolik, use the following commands.
 ```bash
-./Xolik -d db-filename.fasta -s msdata-filename.mzXML -o output-filename.csv --ms1tol 5 --ms2tol 0.02 --parallel --thread 4
+./Xolik -d db-filename.fasta -s msdata-filename.mzXML -o output-filename.csv --ms1tol 5 --ms2tol 0.02
+python splitctrl.py output-filename.csv
 ```
 
-Please use `./Xolik --help` for all available options.
+Use `./Xolik --help` for all available options.
 
 ## Dependencies
 - TCLAP
