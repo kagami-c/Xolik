@@ -14,6 +14,9 @@ python splitctrl.py output-filename.csv
 
 Use `./Xolik --help` for all available options.
 
+The "Score" field in the result files equals to -log10(e-value) by default,
+and equals to XCorr if `--noevalue` is set.
+
 ## Dependencies
 - TCLAP
 - GoogleTest (optional)
