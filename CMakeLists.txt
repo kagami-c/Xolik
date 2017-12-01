@@ -34,3 +34,6 @@ elseif(UNIX)
                                 optimized ${CMAKE_SOURCE_DIR}/lib/libmzloader.a
                                 optimized ${CMAKE_SOURCE_DIR}/lib/libppdata.a)
 endif()
+
+add_executable(unittest test/RegressionTest.cpp)
+target_link_libraries(unittest gtest gtest_main)
