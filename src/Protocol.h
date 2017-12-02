@@ -8,12 +8,11 @@
 #include "Params.h"
 #include "XCorr.h"
 #include "LimXL.h"
-#include "Scores.h"
+#include "ScoreArray.h"
 #include "Evalue.h"
 #include "PPArray.h"
 
-
-double DetermineThreshold(Scores scores, int rank, double default_threshold) {
+double DetermineThreshold(ScoreArray scores, int rank, double default_threshold) {
     if (scores.size() <= rank) { return default_threshold; }
     std::vector<double> local_scores(scores.size(), 0);
     for (int i = 0; i < scores.size(); ++i) {
@@ -22,7 +21,6 @@ double DetermineThreshold(Scores scores, int rank, double default_threshold) {
     std::nth_element(local_scores.begin(), local_scores.begin() + rank - 1, local_scores.end(), std::greater<double>());
     return local_scores[rank - 1];
 }
-
 
 // subroutine for searching one spectrum
 bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
@@ -46,9 +44,7 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
     // build scores
     int maximum_charge = spectrum.precursor_charge > 1 ? spectrum.precursor_charge - 1 : 1;
     maximum_charge = maximum_charge > 6 ? 6 : maximum_charge;
-    Scores scores(processed_peaks, precursor_mass, ppdata, 
-                  params.ms2_tolerance, end_idx,
-                  maximum_charge, pparray);
+    ScoreArray scores(processed_peaks, precursor_mass, params.ms2_tolerance, end_idx, maximum_charge, pparray);
 
     // determine threshold
     double threshold = params.threshold;
@@ -131,8 +127,6 @@ std::vector<Record> SearchBatch(std::vector<MzLoader::Spectrum> spectrum_list, c
 //     4. receive the searching results returned by the function
 std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params& params) {
     std::vector<Record> records;
-
-//    std::vector<double> peptide_masses;  // a separate peptide mass array, already sorted
 
     PPArray pparray(ppdata, params);
     std::vector<double> peptide_masses = pparray.GetMassArray();

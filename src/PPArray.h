@@ -100,4 +100,4 @@ private:
     }
 };
 
-#endif  // XOLIK_PPARRAY_H
+#endif // XOLIK_PPARRAY_H

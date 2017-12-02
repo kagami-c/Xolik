@@ -1,6 +1,8 @@
+#ifndef XOLIK_EVALUE_H
+#define XOLIK_EVALUE_H
+
 #include <vector>
 #include <cmath>
-#include "Scores.h"
 
 // return y = a + b * x as well as a flag to indicate whether the fitting succeeds
 bool LeastSquares(const std::vector<double>& y, const std::vector<double>& x,
@@ -110,3 +112,5 @@ double CalculateEValue(double target, const std::vector<double>& scores) {
     double evalue = pow(10.0, a + b * int(target * 10.0 + 0.05));
     return evalue > 999.0 ? 999.0 : evalue;
 }
+
+#endif // XOLIK_EVALUE_H

@@ -4,13 +4,13 @@
 #include <vector>
 #include <deque>
 #include <algorithm>
-#include "Scores.h"
+#include "ScoreArray.h"
 
 typedef size_t CandIdx;
 typedef double Score;
 typedef double Mass;
 
-std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses, Scores& scores,
+std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses, ScoreArray& scores,
                                                double precursor_mass, double xlinker_mass, double threshold,
                                                double left_tol, double right_tol) {
     auto global_max_info = std::make_tuple(scores.size(), scores.size(), 0.0);  // out of range means no
@@ -67,7 +67,7 @@ std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses
     return global_max_info;
 }
 
-std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& masses, Scores& scores,
+std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& masses, ScoreArray& scores,
                                                double precursor_mass, double xlinker_mass, double threshold,
                                                double left_tol, double right_tol,
                                                std::vector<double>& collected_scores, bool collect, int collect_size) {
