@@ -10,7 +10,7 @@ typedef size_t CandIdx;
 typedef double Score;
 typedef double Mass;
 
-std::tuple<CandIdx, CandIdx, Score> LimXLMatch(const std::vector<double>& masses, ScoreArray& scores,
+std::tuple<CandIdx, CandIdx, Score> XolikMatch(const std::vector<double>& masses, ScoreArray& scores,
                                                double precursor_mass, double xlinker_mass, double threshold,
                                                double left_tol, double right_tol) {
     auto global_max_info = std::make_tuple(scores.size(), scores.size(), 0.0);  // out of range means no

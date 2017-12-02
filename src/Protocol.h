@@ -7,7 +7,7 @@
 #include <PPData.h>
 #include "Params.h"
 #include "XCorr.h"
-#include "LimXL.h"
+#include "Match.h"
 #include "ScoreArray.h"
 #include "Evalue.h"
 #include "PPArray.h"
@@ -60,7 +60,7 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
     std::tuple<CandIdx, CandIdx, Score> max_match;
     std::vector<double> collected_scores; // for evalue estimation
     if (params.use_LimXL_match) {
-        max_match = LimXLMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol);
+        max_match = XolikMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol);
     }
     else {
         max_match = NaiveMatch(peptide_masses, scores, precursor_mass, params.xlmass, threshold, left_tol, right_tol,

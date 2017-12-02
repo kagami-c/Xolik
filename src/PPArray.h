@@ -7,18 +7,18 @@
 #include "Params.h"
 
 struct Peptide {
+    size_t raw_index;
     const PPData::Peptide* raw_peptide;
     size_t link_site;
-    std::vector<std::pair<size_t /* site */, double /* shift */>> mods;
     double mass;
-    size_t raw_index;
+    std::vector<std::pair<size_t /* site */, double /* shift */>> mods;
 };
 
 class PPArray {
 public:
     PPArray(const PPData& ppdata, const Params& params) : peptide_array_(), mass_array_() {
         using std::vector;
-        using std::pair;        
+        using std::pair;
 
         for (auto i = 0; i < ppdata.size(); ++i) {
             auto sites = FindLinkSites(params.xlsite, ppdata[i].sequence, ppdata[i].sequence_length,
@@ -35,7 +35,7 @@ public:
                         total_shifts += p.second;
                     }
                     double total_mass = ppdata[i].mass + total_shifts;
-                    peptide_array_.push_back({ &ppdata[i], site, mods, total_mass, size_t(i) });
+                    peptide_array_.push_back({ size_t(i), &ppdata[i], site, total_mass, mods });
                 }
             }
         }

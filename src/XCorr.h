@@ -1,6 +1,9 @@
-#pragma once
+
 
 // novel preprocessing and scoring
+#ifndef XOLIK_XCORR_H
+#define XOLIK_XCORR_H
+
 std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& peaks,
                                double resolution) {
     if (peaks.empty()) { return std::vector<double>(); }
@@ -11,14 +14,12 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
     auto min_mass = peaks[0].first;
     auto max_mass = peaks[peaks.size() - 1].first;
     const auto num_step = 10;
-    // auto step_unit = (max_mass - min_mass) / 10;
     int step_unit = vector_size / 10 + 1;
 
     int start = 0;
     int end = 0;  // exclude
     int step = 0;
     do {
-        // auto lower_bound = min_mass + step * step_unit;
         double lower_bound = step * step_unit * resolution;
         auto upper_bound = lower_bound + step_unit * resolution;
         start = end;
@@ -116,3 +117,69 @@ double XCorr(const std::vector<double>& spec, double resolution,
     }
     return xcorr * 0.005;
 }
+
+double ModXCorr(const std::vector<double>& spec, double resolution,
+                const char* sequence, size_t sequence_length,
+                size_t modified_site, double mass_shift, int maximum_charge,
+                const std::vector<std::pair<size_t, double>>& mods) {
+    const int spec_size = spec.size();
+    const int mods_size = mods.size();
+
+    // generate theopeaks first, and then sort, to ensure cache locality
+    std::vector<int> theopeaks(2 * sequence_length * maximum_charge, 0);
+    int ion_idx = 0;
+
+    int b_mod_idx = 0;
+    double current_b_ion = 0.0;
+    for (int b_ion_idx = 1; b_ion_idx <= sequence_length; ++b_ion_idx) {
+        current_b_ion += MassTable.at(sequence[b_ion_idx - 1]);
+        if (b_ion_idx - 1 == modified_site) {
+            current_b_ion += mass_shift;
+        }
+        if (b_mod_idx < mods_size && b_ion_idx - 1 == mods[b_mod_idx].first) {
+            current_b_ion += mods[b_mod_idx++].second;
+        }
+        for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
+            double mz_position = current_b_ion / float(charge_state) + PROTON_MASS;
+            int index = int(mz_position / resolution);  // truncate
+            if (index >= spec_size) {
+                continue;
+            }
+            theopeaks[ion_idx++] = index;
+        }
+    }
+
+    int y_mod_idx = mods.size() - 1;
+    double current_y_ion = WATER_MASS;
+    for (int y_ion_idx = 1; y_ion_idx <= sequence_length; ++y_ion_idx) {
+        current_y_ion += MassTable.at(sequence[sequence_length - y_ion_idx]);
+        if (sequence_length - y_ion_idx == modified_site) {
+            current_y_ion += mass_shift;
+        }
+        if (y_mod_idx >= 0 && sequence_length - y_ion_idx == mods[y_mod_idx].first) {
+            current_y_ion += mods[y_mod_idx--].second;
+        }
+        for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
+            double mz_position = current_y_ion / float(charge_state) + PROTON_MASS;
+            int index = int(mz_position / resolution);  // truncate
+            if (index >= spec_size) {
+                continue;
+            }
+            theopeaks[ion_idx++] = index;
+        }
+    }
+
+    // sort before scoring
+    theopeaks.resize(ion_idx);
+//    std::stable_sort(theopeaks.begin(), theopeaks.end());  
+    // TODO: sort will make numerical precision unstable, enable it after all finished.
+
+    // scoring
+    double xcorr = 0.0;
+    for (int pos : theopeaks) {
+        xcorr += spec[pos];
+    }
+    return xcorr * 0.005;
+}
+
+#endif // XOLIK_XCORR_H

@@ -10,7 +10,8 @@ public:
                double ms2_tolerance, size_t total_size, int maximum_charge, const PPArray& pparray)
                : precursor_mass_(precursor_mass), processed_peaks_(processed_peaks), 
                  ms2_tolerance_(ms2_tolerance), maximum_charge_(maximum_charge), 
-                 pparray_(pparray), size_(total_size), cache_flags_(total_size, 0), cache_scores_(total_size, 0.0)  {}
+                 pparray_(pparray), size_(total_size), 
+                 cache_flags_(total_size, 0), cache_scores_(total_size, 0.0)  {}
 
     double operator[](int idx) {
         if (cache_flags_[idx] == 1) {
@@ -20,8 +21,11 @@ public:
             const auto& peptide = *(pparray_[idx].raw_peptide);
             auto site = pparray_[idx].link_site;
             auto mass_shift = precursor_mass_ - peptide.mass;
-            auto xcorr = XCorr(processed_peaks_, ms2_tolerance_, peptide.sequence,
-                               peptide.sequence_length, site, mass_shift, maximum_charge_);
+//            auto xcorr = XCorr(processed_peaks_, ms2_tolerance_, peptide.sequence,
+//                               peptide.sequence_length, site, mass_shift, maximum_charge_);
+            const auto& mods = pparray_[idx].mods;
+            auto xcorr = ModXCorr(processed_peaks_, ms2_tolerance_, peptide.sequence,
+                               peptide.sequence_length, site, mass_shift, maximum_charge_, mods);
             cache_scores_[idx] = xcorr;
             cache_flags_[idx] = 1;
             return xcorr;
