@@ -15,7 +15,7 @@ void Check(std::string reference_file, std::string test_file) {
 	EXPECT_TRUE(ref_file.eof());
 }
 
-TEST(RegressionTest, LimXL_lib1) {
+TEST(RegressionTest, DISABLED_LimXL_lib1) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
@@ -35,7 +35,7 @@ TEST(RegressionTest, LimXL_lib1_noevalue) {
     Check("..\\test\\data\\lib1_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, LimXL_lib2) {
+TEST(RegressionTest, DISABLED_LimXL_lib2) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
@@ -55,7 +55,7 @@ TEST(RegressionTest, LimXL_lib2_noevalue) {
     Check("..\\test\\data\\lib2_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, LimXL_lib3) {
+TEST(RegressionTest, DISABLED_LimXL_lib3) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib3_90min_CID35.mzXML "

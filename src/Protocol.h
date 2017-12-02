@@ -89,6 +89,9 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
 
         double evalue = CalculateEValue(std::get<2>(max_match), collected_scores);
         report_score = -log10(evalue); // - log 10 evalue to make it compatible with FDR control
+        if (std::isnan(report_score)) {
+            report_score = 0.0;  // BUG: solve this problem, the final report is not sorted.
+        }
     }
 
     record_out = {
@@ -155,9 +158,14 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
                                                               task_list[i], ppdata, params, peptide_masses, pparray);
             futures.push_back(std::move(f));
         }
+        std::vector<std::vector<Record>> results;
         for (int i = 0; i < params.thread; ++i) {
             std::vector<Record> r = futures[i].get();
-            records.insert(records.end(), r.begin(), r.end());
+            results.push_back(r);
+//            records.insert(records.end(), r.begin(), r.end());
+        }
+        for (int i = 0; i < idx; ++i) {
+            records.push_back(results[i % params.thread][i / params.thread]);
         }
     }
 
