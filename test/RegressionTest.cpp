@@ -75,7 +75,7 @@ TEST(RegressionTest, LimXL_lib3_noevalue) {
     Check("..\\test\\data\\lib3_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, LimXL_lib1_parallel) {
+TEST(RegressionTest, DISABLED_LimXL_lib1_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
@@ -95,7 +95,7 @@ TEST(RegressionTest, LimXL_lib1_noevalue_parallel) {
     Check("..\\test\\data\\lib1_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, LimXL_lib2_parallel) {
+TEST(RegressionTest, DISABLED_LimXL_lib2_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
@@ -115,7 +115,7 @@ TEST(RegressionTest, LimXL_lib2_noevalue_parallel) {
     Check("..\\test\\data\\lib2_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, LimXL_lib3_parallel) {
+TEST(RegressionTest, DISABLED_LimXL_lib3_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib3_90min_CID35.mzXML "

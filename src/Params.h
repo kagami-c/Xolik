@@ -32,6 +32,12 @@ struct Params {
     double threshold = 0.0001;
     bool enable_rank = false;
     int rank = 1000;
+
+    // modifications
+    std::unordered_map<char, double> fix_mods = {
+        { 'C', +57.021464 /* Fixed Mod on C */ }
+    };
+    std::unordered_map<char, double> var_mods = {};
 };
 
 const std::unordered_map<char, double> MassTable = {
