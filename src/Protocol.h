@@ -161,12 +161,13 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
         std::vector<std::vector<Record>> results;
         for (int i = 0; i < params.thread; ++i) {
             std::vector<Record> r = futures[i].get();
-            results.push_back(r);
-//            records.insert(records.end(), r.begin(), r.end());
+//            results.push_back(r);
+            records.insert(records.end(), r.begin(), r.end());
         }
-        for (int i = 0; i < idx; ++i) {
-            records.push_back(results[i % params.thread][i / params.thread]);
-        }
+//        for (int i = 0; i < idx; ++i) {
+//            records.push_back(results[i % params.thread][i / params.thread]);
+//        }
+        // BUG: when making evalue parallel match noparallel, noevalue parallel does not match, just because of these 4 lines.
     }
 
     return records;
