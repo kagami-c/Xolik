@@ -34,7 +34,8 @@ public:
                     for (auto& p : mods) {
                         total_shifts += p.second;
                     }
-                    double total_mass = ppdata[i].mass + total_shifts;
+                    // PPData internally has +57.021464 at C, so remove it here
+                    double total_mass = ppdata[i].mass + total_shifts - 57.021464;  
                     peptide_array_.push_back({ size_t(i), &ppdata[i], site, total_mass, mods });
                 }
             }
