@@ -1,9 +1,7 @@
-
-
-// novel preprocessing and scoring
 #ifndef XOLIK_XCORR_H
 #define XOLIK_XCORR_H
 
+// novel preprocessing and scoring
 std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& peaks,
                                double resolution) {
     if (peaks.empty()) { return std::vector<double>(); }
@@ -14,7 +12,7 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
     auto min_mass = peaks[0].first;
     auto max_mass = peaks[peaks.size() - 1].first;
     const auto num_step = 10;
-    int step_unit = vector_size / 10 + 1;
+    int step_unit = int(vector_size) / 10 + 1;
 
     int start = 0;
     int end = 0;  // exclude
@@ -122,8 +120,8 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
                 const char* sequence, size_t sequence_length,
                 size_t modified_site, double mass_shift, int maximum_charge,
                 const std::vector<std::pair<size_t, double>>& mods) {
-    const int spec_size = spec.size();
-    const int mods_size = mods.size();
+    const size_t spec_size = spec.size();
+    const size_t mods_size = mods.size();
 
     // generate theopeaks first, and then sort, to ensure cache locality
     std::vector<int> theopeaks(2 * sequence_length * maximum_charge, 0);
@@ -149,7 +147,7 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
         }
     }
 
-    int y_mod_idx = mods.size() - 1;
+    int y_mod_idx = int(mods.size()) - 1;
     double current_y_ion = WATER_MASS;
     for (int y_ion_idx = 1; y_ion_idx <= sequence_length; ++y_ion_idx) {
         current_y_ion += MassTable.at(sequence[sequence_length - y_ion_idx]);
