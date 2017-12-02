@@ -90,7 +90,7 @@ TEST(RegressionTest, LimXL_lib1_noevalue_parallel) {
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
         "-d C:\\Users\\Jiaan\\Desktop\\Experiments\\LimXL\\test\\data\\lib_disulfide_peptides.fasta "
-        "--min 500 --xlsite C --xlmass -116.0430 --ms1tol 50 --ms2tol 0.5 --noevalue  --parallel --thread 4";
+        "--min 500 --xlsite C --xlmass -116.0430 --ms1tol 50 --ms2tol 0.5 --noevalue --parallel --thread 4";
     system(command.c_str());
     Check("..\\test\\data\\lib1_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
@@ -110,7 +110,7 @@ TEST(RegressionTest, LimXL_lib2_noevalue_parallel) {
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
         "-d C:\\Users\\Jiaan\\Desktop\\Experiments\\LimXL\\test\\data\\lib_disulfide_peptides.fasta "
-        "--min 500 --xlsite C --xlmass -116.0430 --ms1tol 50 --ms2tol 0.5 --noevalue  --parallel --thread 4";
+        "--min 500 --xlsite C --xlmass -116.0430 --ms1tol 50 --ms2tol 0.5 --noevalue --parallel --thread 4";
     system(command.c_str());
     Check("..\\test\\data\\lib2_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }

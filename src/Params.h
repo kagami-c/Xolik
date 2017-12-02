@@ -35,7 +35,7 @@ struct Params {
 
     // modifications
     std::unordered_map<char, double> fix_mods = {
-        { 'C', +57.021464 /* Fixed Mod on C */ }
+//        { 'C', +57.021464 /* Fixed Mod on C */ }
     };
     std::unordered_map<char, double> var_mods = {};
 };

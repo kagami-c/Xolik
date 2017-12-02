@@ -12,22 +12,6 @@
 #include "Evalue.h"
 #include "PPArray.h"
 
-inline std::vector<size_t> FindLinkSites(char xlsite, const char* sequence, size_t sequence_length, 
-                                         size_t offset, size_t protein_length) {  
-                                         // for xlsite == K, being cross-linked should not be digested
-    std::vector<size_t> sites;
-    for (auto i = 0; i < sequence_length; ++i) {
-        if (sequence[i] == xlsite) {
-            // protect K & R being digested if it is cross-linked
-            if ((xlsite == 'K' || xlsite == 'R') && i + 1 == sequence_length // last char of the sequence
-                    && offset + sequence_length < protein_length) {  // and is not the end of the whole protein
-                break;
-            }
-            sites.push_back(i);
-        }
-    }
-    return sites;
-}
 
 double DetermineThreshold(Scores scores, int rank, double default_threshold) {
     if (scores.size() <= rank) { return default_threshold; }
@@ -43,9 +27,9 @@ double DetermineThreshold(Scores scores, int rank, double default_threshold) {
 // subroutine for searching one spectrum
 bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
                        const std::vector<double>& peptide_masses,
-                       const std::vector<std::pair<size_t, size_t>> generalized_peptides,
                        const PPData& ppdata,
                        const Params& params,
+                       const PPArray& pparray,
                        Record& record_out) {
 
     // preprocess experimental spectrum
@@ -62,8 +46,9 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
     // build scores
     int maximum_charge = spectrum.precursor_charge > 1 ? spectrum.precursor_charge - 1 : 1;
     maximum_charge = maximum_charge > 6 ? 6 : maximum_charge;
-    Scores scores(processed_peaks, precursor_mass, ppdata, generalized_peptides, params.ms2_tolerance, end_idx,
-                  maximum_charge);
+    Scores scores(processed_peaks, precursor_mass, ppdata, 
+                  params.ms2_tolerance, end_idx,
+                  maximum_charge, pparray);
 
     // determine threshold
     double threshold = params.threshold;
@@ -113,10 +98,10 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
     record_out = {
         spectrum.scan_num,  // SpecIdx
         report_score,  // Score  
-        generalized_peptides[std::get<0>(max_match)].first,  // PeptIdx
-        generalized_peptides[std::get<0>(max_match)].second,  // link site
-        generalized_peptides[std::get<1>(max_match)].first,  // PeptIdx
-        generalized_peptides[std::get<1>(max_match)].second,  // link site
+        pparray[std::get<0>(max_match)].raw_index,  // PeptIdx
+        pparray[std::get<0>(max_match)].link_site,  // link site
+        pparray[std::get<1>(max_match)].raw_index,  // PeptIdx
+        pparray[std::get<1>(max_match)].link_site,  // link site
         scores[std::get<0>(max_match)],  // Score
         scores[std::get<1>(max_match)]  // Score
     };
@@ -125,13 +110,13 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
 
 // for multithread computing
 std::vector<Record> SearchBatch(std::vector<MzLoader::Spectrum> spectrum_list, const PPData& ppdata, const Params& params,
-                                std::vector<double> peptide_masses, std::vector<std::pair<size_t, size_t>> generalized_peptides) {
+                                std::vector<double> peptide_masses, const PPArray& pparray) {
     std::vector<Record> records;
     Record record_buffer;
     for (int i = 0; i < spectrum_list.size(); ++i) {
         MzLoader::Spectrum spectrum_buffer = spectrum_list[i];
 
-        bool success = SearchOneSpectrum(spectrum_buffer, peptide_masses, generalized_peptides, ppdata, params, record_buffer);
+        bool success = SearchOneSpectrum(spectrum_buffer, peptide_masses, ppdata, params, pparray, record_buffer);
         if (success) {
             records.push_back(record_buffer);
         }
@@ -147,22 +132,16 @@ std::vector<Record> SearchBatch(std::vector<MzLoader::Spectrum> spectrum_list, c
 std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params& params) {
     std::vector<Record> records;
 
-    std::vector<std::pair<size_t /*peptide idx*/, size_t /*site idx*/>> generalized_peptides;  // peptide site combinations
-    std::vector<double> peptide_masses;  // a separate peptide mass array, already sorted
-    for (auto i = 0; i < ppdata.size(); ++i) {
-        auto sites = FindLinkSites(params.xlsite, ppdata[i].sequence, ppdata[i].sequence_length, ppdata[i].offset, ppdata[i].protein->sequence_length);
-        for (auto site : sites) {
-            generalized_peptides.push_back(std::make_pair(i, site));
-            peptide_masses.push_back(ppdata[i].mass);
-        }
-    }
+//    std::vector<double> peptide_masses;  // a separate peptide mass array, already sorted
 
+    PPArray pparray(ppdata, params);
+    std::vector<double> peptide_masses = pparray.GetMassArray();
     
     if (!params.enable_parallel) {
         MzLoader::Spectrum spectrum_buffer;
         Record record_buffer;
         while (loader.LoadNext(spectrum_buffer)) { // loop each spectrum
-            bool success = SearchOneSpectrum(spectrum_buffer, peptide_masses, generalized_peptides, ppdata, params, record_buffer);
+            bool success = SearchOneSpectrum(spectrum_buffer, peptide_masses, ppdata, params, pparray, record_buffer);
             if (success) {
                 records.push_back(record_buffer);
             }
@@ -179,7 +158,7 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
         std::vector< std::future< std::vector<Record> > > futures;
         for (int i = 0; i < params.thread; ++i) {
             std::future< std::vector<Record> > f = std::async(std::launch::async, SearchBatch,
-                                                              task_list[i], ppdata, params, peptide_masses, generalized_peptides);
+                                                              task_list[i], ppdata, params, peptide_masses, pparray);
             futures.push_back(std::move(f));
         }
         for (int i = 0; i < params.thread; ++i) {

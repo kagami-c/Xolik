@@ -7,21 +7,19 @@
 #include "Params.h"
 
 struct Peptide {
-    const PPData::Peptide& raw_peptide;
-    const size_t link_site;
-    const std::vector<std::pair<size_t /* mod site */, double /* mass shift */>> mods;
-    const double mass;
+    const PPData::Peptide* raw_peptide;
+    size_t link_site;
+    std::vector<std::pair<size_t /* site */, double /* shift */>> mods;
+    double mass;
+    size_t raw_index;
 };
 
-// TODO:
-// index and searching within this class, make interface simplier
-// enumerate here, and directly send mods vector inside
 class PPArray {
 public:
     PPArray(const PPData& ppdata, const Params& params) : peptide_array_(), mass_array_() {
         using std::vector;
-        using std::pair;
-        
+        using std::pair;        
+
         for (auto i = 0; i < ppdata.size(); ++i) {
             auto sites = FindLinkSites(params.xlsite, ppdata[i].sequence, ppdata[i].sequence_length,
                                        ppdata[i].offset, ppdata[i].protein->sequence_length);
@@ -36,18 +34,16 @@ public:
                     for (auto& p : mods) {
                         total_shifts += p.second;
                     }
-
-                    double mass = ppdata[i].mass + total_shifts;
-                    Peptide peptide = {
-                        ppdata[i],
-                        site,
-                        mods,
-                        mass
-                    };
-                    peptide_array_.push_back(std::move(peptide));
-                    mass_array_.push_back(mass);
+                    double total_mass = ppdata[i].mass + total_shifts;
+                    peptide_array_.push_back({ &ppdata[i], site, mods, total_mass, size_t(i) });
                 }
             }
+        }
+
+        std::stable_sort(peptide_array_.begin(), peptide_array_.end(),
+                         [](const auto& a, const auto& b) { return a.mass < b.mass; });
+        for (auto& p : peptide_array_) {
+            mass_array_.push_back(p.mass);
         }
     }
 
