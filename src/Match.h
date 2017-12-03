@@ -79,16 +79,20 @@ std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_a
     auto max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
     auto last_iter = std::upper_bound(mass_array.begin(), mass_array.begin() + score_array.size(), max_allowed);
     auto last_idx = std::distance(mass_array.begin(), last_iter);
+    int last_start = 0;
+    int last_end = score_array.size();
 
     for (auto i = 0; i < last_idx; ++i) {
 
         auto alpha_mass = mass_array[i];
         auto lower_bound = precursor_mass - alpha_mass - xlinker_mass - left_tol;
         auto upper_bound = precursor_mass - alpha_mass - xlinker_mass + right_tol;
-        auto start = std::lower_bound(mass_array.begin(), mass_array.begin() + score_array.size(), lower_bound);
-        auto end = std::upper_bound(mass_array.begin(), mass_array.begin() + score_array.size(), upper_bound);
-        auto start_idx = std::distance(mass_array.begin(), start);
-        auto end_idx = std::distance(mass_array.begin(), end);
+        auto start = std::lower_bound(mass_array.begin() + last_start, mass_array.begin() + score_array.size(), lower_bound);
+        auto end = std::upper_bound(mass_array.begin() + last_end, mass_array.begin() + score_array.size(), upper_bound);
+        int start_idx = std::distance(mass_array.begin(), start);
+        int end_idx = std::distance(mass_array.begin(), end);
+        last_start = start_idx;
+        last_end = end_idx;
 
         if (start_idx == end_idx) { continue; }
         auto local_max_idx = end_idx - 1;

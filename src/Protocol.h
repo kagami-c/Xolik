@@ -89,8 +89,10 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
             NaiveMatch(mass_array, score_array, precursor_mass, params.xlmass, threshold,
                        -(right_tol + additional_tol - 1.0), right_tol + additional_tol, collected_scores, true, params.histogram_size, placeholder_count);
         }
-
+        placeholder_count = collected_scores.size();
         double evalue = CalculateEValue(std::get<2>(max_match), collected_scores);
+
+
         report_score = -log10(evalue); // - log 10 evalue to make it compatible with FDR control
         if (std::isnan(report_score)) {
             report_score = 0.0;  // BUG: solve this problem, the final report is not sorted.
