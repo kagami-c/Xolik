@@ -80,7 +80,7 @@ std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_a
     auto last_iter = std::upper_bound(mass_array.begin(), mass_array.begin() + score_array.size(), max_allowed);
     auto last_idx = std::distance(mass_array.begin(), last_iter);
     int last_start = 0;
-    int last_end = score_array.size();
+    int last_end = 0;
 
     for (auto i = 0; i < last_idx; ++i) {
 
@@ -91,8 +91,8 @@ std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_a
         auto end = std::upper_bound(mass_array.begin() + last_end, mass_array.begin() + score_array.size(), upper_bound);
         int start_idx = std::distance(mass_array.begin(), start);
         int end_idx = std::distance(mass_array.begin(), end);
-        last_start = start_idx;
-        last_end = end_idx;
+//        last_start = start_idx;
+//        last_end = end_idx;  // BUG: This optimization method has bug
 
         if (start_idx == end_idx) { continue; }
         auto local_max_idx = end_idx - 1;

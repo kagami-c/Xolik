@@ -91,12 +91,16 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
         }
         placeholder_count = collected_scores.size();
         double evalue = CalculateEValue(std::get<2>(max_match), collected_scores);
-
-
-        report_score = -log10(evalue); // - log 10 evalue to make it compatible with FDR control
+        report_score = -evalue -log10(double(count) / double(placeholder_count));
+//        report_score = -evalue;
         if (std::isnan(report_score)) {
-            report_score = 0.0;  // BUG: solve this problem, the final report is not sorted.
+            report_score = -999.0;  // BUG: possible #DEN when compute the original score
+//            std::cerr << "NAN ERROR" << std::endl;
         }
+//        report_score = -log10(evalue); // - log 10 evalue to make it compatible with FDR control
+//        if (std::isnan(report_score)) {
+//            report_score = 0.0;  // BUG: solve this problem, the final report is not sorted.
+//        }
     }
 
     record_out = {

@@ -108,9 +108,11 @@ double CalculateEValue(double target, const std::vector<double>& scores) {
         y.push_back(log10survival[start_idx]);
     }
 
-    // calculate e value
-    double evalue = pow(10.0, a + b * int(target * 10.0 + 0.05));
-    return evalue > 999.0 ? 999.0 : evalue;
+    // calculate the exponent of the e value
+    double exponent = a + b * int(target * 10.0 + 0.05);
+//    double evalue = pow(10.0, a + b * int(target * 10.0 + 0.05));
+//    return evalue > 999.0 ? 999.0 : evalue;
+    return exponent;
 }
 
 #endif // XOLIK_EVALUE_H

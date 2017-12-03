@@ -15,7 +15,7 @@ void Check(std::string reference_file, std::string test_file) {
 	EXPECT_TRUE(ref_file.eof());
 }
 
-TEST(RegressionTest, DISABLED_Xolik_lib1) {
+TEST(RegressionTest, Xolik_lib1) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
