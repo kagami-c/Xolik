@@ -26,7 +26,7 @@ double DetermineThreshold(ScoreArray& scores, int rank, double default_threshold
 
 // subroutine for searching one spectrum
 bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
-                       const std::vector<double>& peptide_masses,
+                       const std::vector<double>& mass_array,
                        const Params& params,
                        const PPArray& pparray,
                        Record& record_out) {
@@ -39,8 +39,8 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
 
     // calculate end_idx
     auto max_allowed_peptide_mass = precursor_mass - params.xlmass - params.min_allowed_mass + right_tol;
-    auto last_iter = std::upper_bound(peptide_masses.begin(), peptide_masses.end(), max_allowed_peptide_mass);
-    auto end_idx = std::distance(peptide_masses.begin(), last_iter);
+    auto last_iter = std::upper_bound(mass_array.begin(), mass_array.end(), max_allowed_peptide_mass);
+    auto end_idx = std::distance(mass_array.begin(), last_iter);
 
     // build score array
     int maximum_charge = spectrum.precursor_charge > 1 ? spectrum.precursor_charge - 1 : 1;
@@ -60,12 +60,13 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
     // match algorithm
     std::tuple<CandIdx, CandIdx, Score> max_match;
     std::vector<double> collected_scores; // for evalue estimation
+    int count = 0;  // for evalue estimation
     if (params.use_LimXL_match) {
-        max_match = XolikMatch(peptide_masses, score_array, precursor_mass, params.xlmass, threshold, left_tol, right_tol);
+        max_match = XolikMatch(mass_array, score_array, precursor_mass, params.xlmass, threshold, left_tol, right_tol, count);
     }
     else {
-        max_match = NaiveMatch(peptide_masses, score_array, precursor_mass, params.xlmass, threshold, left_tol, right_tol,
-                               collected_scores, false, 0);
+        max_match = NaiveMatch(mass_array, score_array, precursor_mass, params.xlmass, threshold, left_tol, right_tol,
+                               collected_scores, false, 0, count);
     }
     if (std::get<0>(max_match) == score_array.size() || std::get<1>(max_match) == score_array.size()) {
         return false;
@@ -75,17 +76,18 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
     // estimate evalue
     if (params.use_E_value) {
         double additional_tol = 0.0;
-        NaiveMatch(peptide_masses, score_array, precursor_mass, params.xlmass, threshold,
-                   left_tol, right_tol, collected_scores, true, params.histogram_size);
+        int placeholder_count = 0;
+        NaiveMatch(mass_array, score_array, precursor_mass, params.xlmass, threshold,
+                   left_tol, right_tol, collected_scores, true, params.histogram_size, placeholder_count);
         while (collected_scores.size() < params.histogram_size && additional_tol + std::max(left_tol, right_tol) <= 20.0) {
             additional_tol += 1.0;
-            NaiveMatch(peptide_masses, score_array, precursor_mass, params.xlmass, threshold,
-                       additional_tol + left_tol, -(additional_tol - 1.0 + left_tol), collected_scores, true, params.histogram_size);
+            NaiveMatch(mass_array, score_array, precursor_mass, params.xlmass, threshold,
+                       additional_tol + left_tol, -(additional_tol - 1.0 + left_tol), collected_scores, true, params.histogram_size, placeholder_count);
             if (collected_scores.size() >= params.histogram_size) {
                 break;
             }
-            NaiveMatch(peptide_masses, score_array, precursor_mass, params.xlmass, threshold,
-                       -(right_tol + additional_tol - 1.0), right_tol + additional_tol, collected_scores, true, params.histogram_size);
+            NaiveMatch(mass_array, score_array, precursor_mass, params.xlmass, threshold,
+                       -(right_tol + additional_tol - 1.0), right_tol + additional_tol, collected_scores, true, params.histogram_size, placeholder_count);
         }
 
         double evalue = CalculateEValue(std::get<2>(max_match), collected_scores);

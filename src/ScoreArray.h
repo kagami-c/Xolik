@@ -1,4 +1,5 @@
-#pragma once
+#ifndef XOLIK_SCOREARRAY_H
+#define XOLIK_SCOREARRAY_H
 
 #include <vector>
 #include "XCorr.h"
@@ -47,3 +48,5 @@ private:
     std::vector<int> cache_flags_;
     std::vector<double> cache_scores_;
 };
+
+#endif // XOLIK_SCOREARRAY_H

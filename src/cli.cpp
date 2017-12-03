@@ -1,11 +1,11 @@
 #include <fstream>
 #include <string>
+#include <chrono>
 #include <tclap/CmdLine.h>
 #include <MzLoader.h>
 #include <PPData.h>
-#include <Protocol.h>
-#include <Fdr.h>
-#include <chrono>
+#include "Protocol.h"
+#include "Fdr.h"
 
 size_t FindProteinNameEnd(const char* name) {
     size_t end = 0;

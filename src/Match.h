@@ -12,7 +12,7 @@ typedef double Mass;
 
 std::tuple<CandIdx, CandIdx, Score> XolikMatch(const std::vector<double>& mass_array, ScoreArray& score_array,
                                                double precursor_mass, double xlinker_mass, double threshold,
-                                               double left_tol, double right_tol) {
+                                               double left_tol, double right_tol, int& count_out) {
     auto global_max_info = std::make_tuple(score_array.size(), score_array.size(), 0.0);  // out of range means no
     auto max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
     auto last_iter = std::upper_bound(mass_array.begin(), mass_array.begin() + score_array.size(), max_allowed);
@@ -52,6 +52,9 @@ std::tuple<CandIdx, CandIdx, Score> XolikMatch(const std::vector<double>& mass_a
             --backward_front;
         }
 
+        // optional: to support evalue estimation
+        count_out += (backward_end + 1 - backward_front);
+
         // Step 3: get maximum, front of the deque
         // because of this specific case, it is possible that no element in the deque
         if (!deque.empty()) {  // if deque.empty() means
@@ -70,7 +73,8 @@ std::tuple<CandIdx, CandIdx, Score> XolikMatch(const std::vector<double>& mass_a
 std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_array, ScoreArray& score_array,
                                                double precursor_mass, double xlinker_mass, double threshold,
                                                double left_tol, double right_tol,
-                                               std::vector<double>& collected_scores, bool collect, int collect_size) {
+                                               std::vector<double>& collected_scores, bool collect, int collect_size,
+                                               int& count_out) {
     auto global_max_info = std::make_tuple(score_array.size(), score_array.size(), 0.0);  // out of range means no
     auto max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
     auto last_iter = std::upper_bound(mass_array.begin(), mass_array.begin() + score_array.size(), max_allowed);
@@ -97,6 +101,9 @@ std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_a
                     return global_max_info;
                 }
             }
+
+            // optional: to support evalue estimation
+            ++count_out;
 
             if (score_array[j] > score_array[local_max_idx]) {
                 local_max_idx = j;
