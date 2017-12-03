@@ -42,13 +42,26 @@ void WriteResults(const char* output_path, const std::vector<Record>& records,
 Params ParseArguments(int argc, const char** argv) {
     using StringArg = TCLAP::ValueArg<std::string>;
     using DoubleArg = TCLAP::ValueArg<double>;
+    using IntArg = TCLAP::ValueArg<int>;
     TCLAP::CmdLine cmd("Xolik - A linear-time algorithm for searching cross-linked peptides", ' ', "beta");
-    TCLAP::ValueArg<int> thread_arg("", "thread", "Number of threads for parallel computing, used together with --parallel", false, 4, "INT", cmd);
+    // TODO: add enzyme setting
+//    std::vector<std::string> allowed_enzymes = { "trypsin" };
+//    TCLAP::ValuesConstraint<std::string> enzyme_constraint(allowed_enzymes);
+//    StringArg enzyme_arg("", "enzyme", "Enzyme for in silico digestion.", false, "trypsin", &enzyme_constraint, cmd);
+    StringArg varmod_arg("", "varmod", "Variable modifications (Example: \"M+15.9949:S+79.96633\", use + or - to "
+                         "connect AA with MASS, use : to separate multiple mods)", false, "", "PATTERN", cmd);
+    StringArg fixmod_arg("", "fixmod", "Fixed modifications (Example: \"C+57.021464\", use + or - to connect AA with "
+                         "MASS, use : to separate multiple mods)", false, "C+57.021464", "PATTERN", cmd);
+    IntArg thread_arg("", "thread", "Number of threads for parallel computing, used together with --parallel", 
+                                    false, 4, "INT", cmd);
     TCLAP::SwitchArg parallel_arg("", "parallel", "Enable parallel computing by multi-threading", cmd);
-    TCLAP::ValueArg<int> histogram_size_arg("", "histogram_size", "Minimum data points required to build histogram for E-value estimation", 
+    IntArg histogram_size_arg("", "histogram_size",
+                                            "Minimum data points required to build histogram for E-value estimation", 
                                             false, 15000, "SIZE", cmd);
-    TCLAP::SwitchArg noevalue_arg("", "noevalue", "Disable E-value estimation, E-value will be reported as -log10(evalue)", cmd);
-    TCLAP::ValueArg<int> rank_arg("", "rank", "Rank threshold, used together with --enable_rank", false, 1000, "Rank", cmd);
+    TCLAP::SwitchArg noevalue_arg("", "noevalue", 
+                                  "Disable E-value estimation, E-value will be reported as -log10(evalue)", cmd);
+    IntArg rank_arg("", "rank", "Rank threshold, used together with --enable_rank",
+                                  false, 1000, "Rank", cmd);
     TCLAP::SwitchArg enable_rank_arg("", "enable_rank", "Enable rank-based filter on single peptide", cmd);
     DoubleArg thresh_arg("", "threshold", "Score threshold", false, 0.0001, "Xcorr", cmd);
     DoubleArg ms2_tol_arg("", "ms2tol", "MS2 tolerance", false, 0.5, "Da", cmd);
@@ -57,9 +70,10 @@ Params ParseArguments(int argc, const char** argv) {
     TCLAP::ValueArg<char> xlsite_arg("", "xlsite", "Cross-linked site", false, 'K', "AA", cmd);
     DoubleArg max_mass_arg("", "max", "Maximum peptide mass", false, 5000, "Da", cmd);
     DoubleArg min_mass_arg("", "min", "Minimum peptide mass", false, 1000, "Da", cmd);
-    TCLAP::ValueArg<int> miss_cleavage_arg("", "miss", "Maximum miss cleavage", false, 2, "INT", cmd);
+    IntArg miss_cleavage_arg("", "miss", "Maximum miss cleavage", false, 2, "INT", cmd);
     TCLAP::SwitchArg disable_decoy_arg("", "disable_decoy", "Disable automatically decoy protein generation", cmd);
-    TCLAP::SwitchArg disable_linear_arg("", "disable_linear", "Disable linear-time algorithm, fallback to quadratic-time", cmd);
+    TCLAP::SwitchArg disable_linear_arg("", "disable_linear", 
+                                        "Disable linear-time algorithm, fallback to quadratic-time", cmd);
     StringArg output_path_arg("o", "output", "Output path", true, "", "FILE", cmd);
     StringArg mzfile_path_arg("s", "spectrum", "Mass spectrum file", true, "", "mzXML/mzML", cmd);
     StringArg database_path_arg("d", "database", "Database file", true, "", "FASTA", cmd);
@@ -86,6 +100,29 @@ Params ParseArguments(int argc, const char** argv) {
     params.enable_parallel = parallel_arg.getValue();
     params.thread = thread_arg.getValue();
 
+    auto mod_pattern_parse = [](const std::string& arg, std::unordered_map<char, double>& map_out) {
+        std::stringstream argstream(arg);
+        char c;
+        while (argstream >> c) {
+            if (c == ':') {
+                continue;
+            } else if ('A' <= c && c <= 'Z' && c != 'X' && c != 'B' && c != 'Z' && c != 'J') {
+                double mass_shift;
+                if (argstream >> mass_shift) {
+                    map_out[c] = mass_shift;
+                } else {
+                    std::cerr << "Parse mod pattern error: no mass shift value specified.\n";
+                    exit(EXIT_FAILURE);
+                }
+            } else {
+                std::cerr << "Parse mod pattern error: unknown amino acid " << c << ".\n";
+                exit(EXIT_FAILURE);
+            }
+        }
+    };
+    mod_pattern_parse(fixmod_arg.getValue(), params.fix_mods);
+    mod_pattern_parse(varmod_arg.getValue(), params.var_mods);
+    
     return params;
 }
 
@@ -110,6 +147,27 @@ void PrintSettings(const Params& params) {
     printf("Histogram size:        %d\n", params.histogram_size);
     printf("Parallel computing:    %s\n", params.enable_parallel ? "true" : "false");
     printf("Number of threads:     %d\n", params.thread);
+    printf("Enzyme:                %s\n", params.enzyme.c_str());
+
+    auto print_map = [](const std::unordered_map<char, double>& map) {
+        if (map.empty()) {
+            printf("None\n");
+        } else {
+            bool first = true;
+            for (const auto& kv : map) {
+                if (first) {
+                    first = false;
+                } else {
+                    printf("                       ");
+                }
+                printf("%c %+.6f Da\n", kv.first, kv.second);
+            }
+        }
+    };
+    printf("Fixed mods:            ");
+    print_map(params.fix_mods);
+    printf("Variable mods:         ");
+    print_map(params.var_mods);
 }
 
 int main(int argc, const char** argv) {

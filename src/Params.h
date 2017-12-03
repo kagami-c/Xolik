@@ -4,39 +4,42 @@
 
 // simply a struct storing all we need for a run of a search
 struct Params {
-    // required
+    // data input and output, required
     std::string database_path = "";
     std::string mzfile_path = "";
     std::string output_path = "";
 
-    // optional
-    char xlsite = 'K';
-    double xlmass = 138.0680796;
-
+    // database digest
+    std::string enzyme = "trypsin";
+    unsigned max_miss_cleavage = 2;
     double min_allowed_mass = 1000;  // Da
     double max_allowed_mass = 5000;  // Da
+    bool append_decoy = true;
 
+    // mass match
     double ms1_tolerance = 50;  // ppm
     double ms2_tolerance = 0.5;  // Da
 
-    unsigned max_miss_cleavage = 2;
-    bool append_decoy = true;
-    bool use_LimXL_match = true;
+    // cross link
+    char xlsite = 'K';
+    double xlmass = 138.0680796;
 
+    // search options
+    bool use_LimXL_match = true;
+    double threshold = 0.0001;  // Xcorr score threshold
+    bool enable_rank = false;
+    int rank = 1000;
+    
+    // evalue
     bool use_E_value = true;
     int histogram_size = 15000;
+
+    // parallel
     bool enable_parallel = false;
     int thread = 4;
 
-    // filter settings
-    double threshold = 0.0001;
-    bool enable_rank = false;
-    int rank = 1000;
-
     // modifications
-    std::unordered_map<char, double> fix_mods = {
-        { 'C', +57.021464 /* Fixed Mod on C */ }
-    };
+    std::unordered_map<char, double> fix_mods = { { 'C', +57.021464 } };
     std::unordered_map<char, double> var_mods = {};
 };
 
