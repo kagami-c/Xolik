@@ -1,4 +1,5 @@
-#pragma once
+#ifndef XOLIK_MATCH_H
+#define XOLIK_MATCH_H
 
 #include <tuple>
 #include <vector>
@@ -124,3 +125,5 @@ std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_a
     }
     return global_max_info;
 }
+
+#endif // XOLIK_MATCH_H

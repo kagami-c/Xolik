@@ -1,4 +1,5 @@
-#pragma once
+#ifndef XOLIK_FDR_H
+#define XOLIK_FDR_H
 
 #include <vector>
 #include <algorithm>
@@ -60,3 +61,5 @@ std::vector<double> CalculateFDR(std::vector<Record>& records, const PPData& ppd
     }
     return q_values;
 }
+
+#endif // XOLIK_FDR_H

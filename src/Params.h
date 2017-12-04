@@ -1,4 +1,5 @@
-#pragma once
+#ifndef XOLIK_PARAMS_H
+#define XOLIK_PARAMS_H
 
 #include <unordered_map>
 
@@ -71,3 +72,5 @@ struct Record {
     double alpha_score;
     double beta_score;
 };
+
+#endif // XOLIK_PARAMS_H
