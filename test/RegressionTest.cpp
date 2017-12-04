@@ -75,7 +75,7 @@ TEST(RegressionTest, Xolik_lib3_noevalue) {
     Check("..\\test\\data\\lib3_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, DISABLED_Xolik_lib1_parallel) {
+TEST(RegressionTest, Xolik_lib1_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "

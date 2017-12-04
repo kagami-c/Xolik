@@ -4,7 +4,7 @@
 #include <tclap/CmdLine.h>
 #include <MzLoader.h>
 #include <PPData.h>
-#include "Protocol.h"
+#include "Search.h"
 #include "Fdr.h"
 
 size_t FindProteinNameEnd(const char* name) {

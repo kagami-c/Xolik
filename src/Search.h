@@ -1,4 +1,5 @@
-#pragma once
+#ifndef XOLIK_SEARCH_H
+#define XOLIK_SEARCH_H
 
 #include <future>
 #include <algorithm>
@@ -140,32 +141,40 @@ std::vector<Record> Search(MzLoader& loader, const PPData& ppdata, const Params&
                 records.push_back(record_buffer);
             }
         }
-
     } else {  // multithread version
-        std::vector< std::vector<MzLoader::Spectrum> > task_list(params.thread, std::vector<MzLoader::Spectrum>());
+        std::vector<std::vector<MzLoader::Spectrum>> task_list(params.thread, std::vector<MzLoader::Spectrum>());
         int idx = 0;
         MzLoader::Spectrum spectrum_buffer;
         while (loader.LoadNext(spectrum_buffer)) {  // loop each spectrum
             task_list[idx % params.thread].push_back(spectrum_buffer);
             ++idx;
         }
-        std::vector< std::future< std::vector<Record> > > futures;
+        std::vector<std::future<std::vector<Record>>> futures;
         for (int i = 0; i < params.thread; ++i) {
-            std::future< std::vector<Record> > f = std::async(std::launch::async, 
+            std::future<std::vector<Record>> f = std::async(std::launch::async, 
                     SearchBatch, task_list[i], peptide_masses, pparray, params);
             futures.push_back(std::move(f));
         }
-//        std::vector<std::vector<Record>> results;
+        std::vector<std::vector<Record>> results;  // TODO: better multithread code, this version is quite ugly
         for (int i = 0; i < params.thread; ++i) {
             std::vector<Record> r = futures[i].get();
-//            results.push_back(r);
-            records.insert(records.end(), r.begin(), r.end());
+            results.push_back(r);
+//            records.insert(records.end(), r.begin(), r.end());
         }
-//        for (int i = 0; i < idx; ++i) {
-//            records.push_back(results[i % params.thread][i / params.thread]);
-//        }
-        // BUG: when making evalue parallel match noparallel, noevalue parallel does not match, just because of these 4 lines.
+        std::vector<int> indexes(params.thread, 0);
+        bool flag = true;
+        while (flag) {
+            flag = false;
+            for (int i = 0; i < params.thread; ++i) {
+                if (indexes[i] < results[i].size()) {
+                    flag = true;
+                    records.push_back(results[i][indexes[i]++]);
+                }
+            }
+        }
     }
 
     return records;
 }
+
+#endif // XOLIK_SEARCH_H
