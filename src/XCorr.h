@@ -140,7 +140,6 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
     int b_mod_idx = 0;
     double current_b_ion = 0.0;
     for (int b_ion_idx = 1; b_ion_idx <= sequence_length; ++b_ion_idx) {
-//        current_b_ion += MassTable.at(sequence[b_ion_idx - 1]);
         current_b_ion += MassTable[sequence[b_ion_idx - 1] - 'A'];
         if (b_ion_idx - 1 == modified_site) {
             current_b_ion += mass_shift;
@@ -149,7 +148,6 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
             current_b_ion += mods[b_mod_idx++].second;
         }
         for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
-//            double mz_position = current_b_ion / float(charge_state) + PROTON_MASS;
             double mz_position = current_b_ion * inv_charge[charge_state] + PROTON_MASS;
             int index = static_cast<int>(mz_position * inv_resolution);  // truncate
             if (index >= spec_size) {
@@ -162,7 +160,6 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
     int y_mod_idx = static_cast<int>(mods.size()) - 1;  // already consider whether mods exist
     double current_y_ion = WATER_MASS;
     for (int y_ion_idx = 1; y_ion_idx <= sequence_length; ++y_ion_idx) {
-//        current_y_ion += MassTable.at(sequence[sequence_length - y_ion_idx]);
         current_y_ion += MassTable[sequence[sequence_length - y_ion_idx] - 'A'];
         if (sequence_length - y_ion_idx == modified_site) {
             current_y_ion += mass_shift;
@@ -170,8 +167,7 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
         if (y_mod_idx >= 0 && sequence_length - y_ion_idx == mods[y_mod_idx].first) {
             current_y_ion += mods[y_mod_idx--].second;
         }
-        for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
-//            double mz_position = current_y_ion / float(charge_state) + PROTON_MASS;
+        for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {  // TODO: Optimize this line has to reorder the computation, which lead to unstable numerical computation.
             double mz_position = current_y_ion * inv_charge[charge_state] + PROTON_MASS;
             int index = static_cast<int>(mz_position * inv_resolution);  // truncate
             if (index >= spec_size) {
