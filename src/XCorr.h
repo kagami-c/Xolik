@@ -120,7 +120,18 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
                 const char* sequence, size_t sequence_length,
                 size_t modified_site, double mass_shift, int maximum_charge,
                 const std::vector<std::pair<size_t, double>>& mods) {
+    
+    constexpr double MassTable[26] = {
+        71.03712 /* A */, NAN /* B */, 103.00919 /* C */, 115.02695 /* D */,
+        129.04260 /* E */, 147.06842 /* F */, 57.02147 /* G */, 137.05891 /* H */,
+        113.08407 /* I */, NAN /* J */, 128.09497 /* K */, 113.08407 /* L */,
+        131.04049 /* M */, 114.04293 /* N */, NAN /* O */, 97.05277 /* P */,
+        128.05858 /* Q */, 156.10112 /* R */, 87.03203 /* S */, 101.04768 /* T */,
+        NAN /* U */, 99.06842 /* V */, 186.07932 /* W */, NAN /* X */,
+        163.06333 /* Y */, NAN /* Z */
+    };
 
+    constexpr double inv_charge[] = { 0.0, 1.0 / 1.0, 1.0 / 2.0, 1.0 / 3.0, 1.0 / 4.0, 1.0 / 5.0, 1.0 / 6.0 };
     const size_t spec_size = spec.size();
     const size_t mods_size = mods.size();
     const double inv_resolution = 1 / resolution;
@@ -129,7 +140,8 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
     int b_mod_idx = 0;
     double current_b_ion = 0.0;
     for (int b_ion_idx = 1; b_ion_idx <= sequence_length; ++b_ion_idx) {
-        current_b_ion += MassTable.at(sequence[b_ion_idx - 1]);
+//        current_b_ion += MassTable.at(sequence[b_ion_idx - 1]);
+        current_b_ion += MassTable[sequence[b_ion_idx - 1] - 'A'];
         if (b_ion_idx - 1 == modified_site) {
             current_b_ion += mass_shift;
         }
@@ -137,7 +149,8 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
             current_b_ion += mods[b_mod_idx++].second;
         }
         for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
-            double mz_position = current_b_ion / float(charge_state) + PROTON_MASS;
+//            double mz_position = current_b_ion / float(charge_state) + PROTON_MASS;
+            double mz_position = current_b_ion * inv_charge[charge_state] + PROTON_MASS;
             int index = static_cast<int>(mz_position * inv_resolution);  // truncate
             if (index >= spec_size) {
                 continue;
@@ -149,7 +162,8 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
     int y_mod_idx = static_cast<int>(mods.size()) - 1;  // already consider whether mods exist
     double current_y_ion = WATER_MASS;
     for (int y_ion_idx = 1; y_ion_idx <= sequence_length; ++y_ion_idx) {
-        current_y_ion += MassTable.at(sequence[sequence_length - y_ion_idx]);
+//        current_y_ion += MassTable.at(sequence[sequence_length - y_ion_idx]);
+        current_y_ion += MassTable[sequence[sequence_length - y_ion_idx] - 'A'];
         if (sequence_length - y_ion_idx == modified_site) {
             current_y_ion += mass_shift;
         }
@@ -157,7 +171,8 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
             current_y_ion += mods[y_mod_idx--].second;
         }
         for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
-            double mz_position = current_y_ion / float(charge_state) + PROTON_MASS;
+//            double mz_position = current_y_ion / float(charge_state) + PROTON_MASS;
+            double mz_position = current_y_ion * inv_charge[charge_state] + PROTON_MASS;
             int index = static_cast<int>(mz_position * inv_resolution);  // truncate
             if (index >= spec_size) {
                 continue;
