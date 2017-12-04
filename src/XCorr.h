@@ -120,12 +120,11 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
                 const char* sequence, size_t sequence_length,
                 size_t modified_site, double mass_shift, int maximum_charge,
                 const std::vector<std::pair<size_t, double>>& mods) {
+
     const size_t spec_size = spec.size();
     const size_t mods_size = mods.size();
-
-    // generate theopeaks first, and then sort, to ensure cache locality
-    std::vector<int> theopeaks(2 * sequence_length * maximum_charge, 0);
-    int ion_idx = 0;
+    const double inv_resolution = 1 / resolution;
+    double xcorr = 0.0;
 
     int b_mod_idx = 0;
     double current_b_ion = 0.0;
@@ -139,15 +138,15 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
         }
         for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
             double mz_position = current_b_ion / float(charge_state) + PROTON_MASS;
-            int index = int(mz_position / resolution);  // truncate
+            int index = static_cast<int>(mz_position * inv_resolution);  // truncate
             if (index >= spec_size) {
                 continue;
             }
-            theopeaks[ion_idx++] = index;
+            xcorr += spec[index];
         }
     }
 
-    int y_mod_idx = int(mods.size()) - 1;
+    int y_mod_idx = static_cast<int>(mods.size()) - 1;  // already consider whether mods exist
     double current_y_ion = WATER_MASS;
     for (int y_ion_idx = 1; y_ion_idx <= sequence_length; ++y_ion_idx) {
         current_y_ion += MassTable.at(sequence[sequence_length - y_ion_idx]);
@@ -159,24 +158,14 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
         }
         for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {
             double mz_position = current_y_ion / float(charge_state) + PROTON_MASS;
-            int index = int(mz_position / resolution);  // truncate
+            int index = static_cast<int>(mz_position * inv_resolution);  // truncate
             if (index >= spec_size) {
                 continue;
             }
-            theopeaks[ion_idx++] = index;
+            xcorr += spec[index];
         }
     }
 
-    // sort before scoring
-    theopeaks.resize(ion_idx);
-//    std::stable_sort(theopeaks.begin(), theopeaks.end());  
-    // TODO: sort will make numerical precision unstable, enable it after all finished.
-
-    // scoring
-    double xcorr = 0.0;
-    for (int pos : theopeaks) {
-        xcorr += spec[pos];
-    }
     return xcorr * 0.005;
 }
 
