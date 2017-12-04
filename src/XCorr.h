@@ -9,8 +9,8 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
     std::vector<double> processed_peaks(vector_size);
 
     // normalize in local range
-    auto min_mass = peaks[0].first;
-    auto max_mass = peaks[peaks.size() - 1].first;
+    double min_mass = peaks[0].first;
+    double max_mass = peaks[peaks.size() - 1].first;
     const auto num_step = 10;
     int step_unit = int(vector_size) / 10 + 1;
 
@@ -19,7 +19,7 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
     int step = 0;
     do {
         double lower_bound = step * step_unit * resolution;
-        auto upper_bound = lower_bound + step_unit * resolution;
+        double upper_bound = lower_bound + step_unit * resolution;
         start = end;
         while (end < peaks.size() && peaks[end].first <= upper_bound) {
             ++end;
@@ -27,16 +27,16 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
         // from start to end (excluded) is the range for normalization
         if (start == end) { continue; }
         double local_max_intensity = 0;
-        for (auto i = start; i < end; ++i) {
+        for (int i = start; i < end; ++i) {
             if (peaks[i].second > local_max_intensity) {
                 local_max_intensity = peaks[i].second;
             }
         }
 
         // fill processed peaks
-        auto normalized_factor = 50 / sqrt(local_max_intensity);
+        double normalized_factor = 50 / sqrt(local_max_intensity);
         for (auto i = start; i < end; ++i) {
-            auto normalized_intensity = sqrt(peaks[i].second) * normalized_factor;
+            double normalized_intensity = sqrt(peaks[i].second) * normalized_factor;
             int index = int(peaks[i].first / resolution);
             if (normalized_intensity > processed_peaks[index]) {
                 processed_peaks[index] = normalized_intensity;

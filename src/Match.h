@@ -9,20 +9,22 @@
 
 typedef size_t CandIdx;
 typedef double Score;
-typedef double Mass;
 
-std::tuple<CandIdx, CandIdx, Score> XolikMatch(const std::vector<double>& mass_array, ScoreArray& score_array,
+std::tuple<CandIdx, CandIdx, Score> XolikMatch(const std::vector<double>& mass_array, 
+                                               ScoreArray& score_array,
                                                double precursor_mass, double xlinker_mass, double threshold,
-                                               double left_tol, double right_tol, int& count_out) {
+                                               double left_tol, double right_tol, 
+                                               int& count_out) {
+
     auto global_max_info = std::make_tuple(score_array.size(), score_array.size(), 0.0);  // out of range means no
-    auto max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
+    double max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
     auto last_iter = std::upper_bound(mass_array.begin(), mass_array.begin() + score_array.size(), max_allowed);
-    auto last_idx = std::distance(mass_array.begin(), last_iter);
+    int last_idx = std::distance(mass_array.begin(), last_iter);
 
     int forward_idx = 0;
-    int backward_front = score_array.size();
-    int backward_end = score_array.size() - 1;
-    std::deque<size_t> deque;  // store indexes
+    int backward_front = static_cast<int>(score_array.size());
+    int backward_end = static_cast<int>(score_array.size()) - 1;
+    std::deque<int> deque;  // store indexes
     while (forward_idx < last_idx) {
 
         auto alpha_mass = mass_array[forward_idx];
@@ -71,29 +73,27 @@ std::tuple<CandIdx, CandIdx, Score> XolikMatch(const std::vector<double>& mass_a
     return global_max_info;
 }
 
-std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_array, ScoreArray& score_array,
+std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_array, 
+                                               ScoreArray& score_array,
                                                double precursor_mass, double xlinker_mass, double threshold,
                                                double left_tol, double right_tol,
                                                std::vector<double>& collected_scores, bool collect, int collect_size,
                                                int& count_out) {
+
     auto global_max_info = std::make_tuple(score_array.size(), score_array.size(), 0.0);  // out of range means no
-    auto max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
+    double max_allowed = (precursor_mass - xlinker_mass + right_tol) / 2;
     auto last_iter = std::upper_bound(mass_array.begin(), mass_array.begin() + score_array.size(), max_allowed);
-    auto last_idx = std::distance(mass_array.begin(), last_iter);
-    int last_start = 0;
-    int last_end = 0;
+    int last_idx = std::distance(mass_array.begin(), last_iter);
 
     for (auto i = 0; i < last_idx; ++i) {
 
         auto alpha_mass = mass_array[i];
         auto lower_bound = precursor_mass - alpha_mass - xlinker_mass - left_tol;
         auto upper_bound = precursor_mass - alpha_mass - xlinker_mass + right_tol;
-        auto start = std::lower_bound(mass_array.begin() + last_start, mass_array.begin() + score_array.size(), lower_bound);
-        auto end = std::upper_bound(mass_array.begin() + last_end, mass_array.begin() + score_array.size(), upper_bound);
+        auto start = std::lower_bound(mass_array.begin(), mass_array.begin() + score_array.size(), lower_bound);
+        auto end = std::upper_bound(mass_array.begin(), mass_array.begin() + score_array.size(), upper_bound);
         int start_idx = std::distance(mass_array.begin(), start);
         int end_idx = std::distance(mass_array.begin(), end);
-//        last_start = start_idx;
-//        last_end = end_idx;  // BUG: This optimization method has bug
 
         if (start_idx == end_idx) { continue; }
         auto local_max_idx = end_idx - 1;
