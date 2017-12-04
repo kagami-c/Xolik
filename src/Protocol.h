@@ -63,8 +63,7 @@ bool SearchOneSpectrum(const MzLoader::Spectrum& spectrum,
     int count = 0;  // for evalue estimation
     if (params.use_LimXL_match) {
         max_match = XolikMatch(mass_array, score_array, precursor_mass, params.xlmass, threshold, left_tol, right_tol, count);
-    }
-    else {
+    } else {
         max_match = NaiveMatch(mass_array, score_array, precursor_mass, params.xlmass, threshold, left_tol, right_tol,
                                collected_scores, false, 0, count);
     }

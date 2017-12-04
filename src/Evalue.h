@@ -7,7 +7,7 @@
 // return y = a + b * x as well as a flag to indicate whether the fitting succeeds
 bool LeastSquares(const std::vector<double>& y, const std::vector<double>& x,
                   double& a_out, double& b_out) {
-    if (y.size() != x.size() || y.empty()) {
+    if (y.size() != x.size() || y.size() <= 1) {
         return false;
     }
     int size = y.size();
@@ -42,6 +42,7 @@ double CalculateEValue(double target, const std::vector<double>& scores) {
     int max_idx = 0;
     for (double xcorr : scores) {
         int idx = int(xcorr * 10.0 + 0.05);
+        idx = idx >= 0 ? idx : 0;
         if (idx >= histogram_size) {
             idx = histogram_size - 1;
         }
@@ -67,7 +68,7 @@ double CalculateEValue(double target, const std::vector<double>& scores) {
     if (i == max_idx) {
         end_idx = max_idx > 12 ? max_idx - 2 : max_idx;
     }
-
+    
     // generate survival
     vector<double> survival(histogram_size, 0.0);
     survival[end_idx] = histogram[end_idx];
@@ -98,11 +99,14 @@ double CalculateEValue(double target, const std::vector<double>& scores) {
     double b = 0.0;
     for (int j = start_idx; j <= end_idx; ++j) {
         if (survival[j] > 0) {
+            if (y.empty()) {  // set the fallback of a and b
+                a = log10survival[j];
+            }
             x.push_back(j);
             y.push_back(log10survival[j]);
         }
     }
-    while (!LeastSquares(y, x, a, b) || (start_idx > 0 && b >= 0)) {
+    while ((!LeastSquares(y, x, a, b) && start_idx > 0) || (start_idx > 0 && b >= 0)) {
         --start_idx;
         x.push_back(start_idx);
         y.push_back(log10survival[start_idx]);
