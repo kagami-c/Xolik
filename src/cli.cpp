@@ -48,6 +48,7 @@ Params ParseArguments(int argc, const char** argv) {
 //    std::vector<std::string> allowed_enzymes = { "trypsin" };
 //    TCLAP::ValuesConstraint<std::string> enzyme_constraint(allowed_enzymes);
 //    StringArg enzyme_arg("", "enzyme", "Enzyme for in silico digestion.", false, "trypsin", &enzyme_constraint, cmd);
+    TCLAP::SwitchArg clrmod_arg("", "clear_mod", "Clear modification table", cmd);
     StringArg varmod_arg("", "varmod", "Variable modifications (Example: \"M+15.9949:S+79.96633\", use + or - to "
                          "connect AA with MASS, use : to separate multiple mods)", false, "", "PATTERN", cmd);
     StringArg fixmod_arg("", "fixmod", "Fixed modifications (Example: \"C+57.021464\", use + or - to connect AA with "
@@ -56,8 +57,8 @@ Params ParseArguments(int argc, const char** argv) {
                                     false, 4, "INT", cmd);
     TCLAP::SwitchArg parallel_arg("", "parallel", "Enable parallel computing by multi-threading", cmd);
     IntArg histogram_size_arg("", "histogram_size",
-                                            "Minimum data points required to build histogram for E-value estimation", 
-                                            false, 15000, "SIZE", cmd);
+                              "Minimum data points required to build histogram for E-value estimation", 
+                              false, 15000, "SIZE", cmd);
     TCLAP::SwitchArg noevalue_arg("", "noevalue", 
                                   "Disable E-value estimation, E-value will be reported as -log10(evalue)", cmd);
     IntArg rank_arg("", "rank", "Rank threshold, used together with --enable_rank",
@@ -100,7 +101,8 @@ Params ParseArguments(int argc, const char** argv) {
     params.enable_parallel = parallel_arg.getValue();
     params.thread = thread_arg.getValue();
 
-    auto mod_pattern_parse = [](const std::string& arg, std::unordered_map<char, double>& map_out) {
+    auto mod_pattern_parse = [](const std::string& arg) {
+        std::unordered_map<char, double> map_out;
         std::stringstream argstream(arg);
         char c;
         while (argstream >> c) {
@@ -111,21 +113,28 @@ Params ParseArguments(int argc, const char** argv) {
                 if (argstream >> mass_shift) {
                     map_out[c] = mass_shift;
                 } else {
-                    std::cerr << "Parse mod pattern error: no mass shift value specified.\n";
+                    std::cerr << "Parse pattern " << arg << " error: no mass shift value specified.\n";
                     exit(EXIT_FAILURE);
                 }
             } else {
-                std::cerr << "Parse mod pattern error: unknown amino acid " << c << ".\n";
+                std::cerr << "Parse pattern " << arg << " error: unknown amino acid " << c << ".\n";
                 exit(EXIT_FAILURE);
             }
         }
+        return map_out;
     };
-    mod_pattern_parse(fixmod_arg.getValue(), params.fix_mods);
-    mod_pattern_parse(varmod_arg.getValue(), params.var_mods);
+    if (clrmod_arg.getValue()) {
+        params.fix_mods = mod_pattern_parse("");
+        params.var_mods = mod_pattern_parse("");
+    } else {
+        params.fix_mods = mod_pattern_parse(fixmod_arg.getValue());
+        params.var_mods = mod_pattern_parse(varmod_arg.getValue());
+    }
     
     return params;
 }
 
+// TODO: Adjust setting print after all stuffs are finished
 void PrintSettings(const Params& params) {
     printf("Xolik ver.beta (%s, %s)\n", __DATE__, __TIME__);
     printf("Database:              %s\n", params.database_path.c_str());
