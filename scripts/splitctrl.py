@@ -3,7 +3,7 @@ import sys
 import pandas as pd
 
 if len(sys.argv) <= 1:
-    print 'Please specify input filename.'
+    print('Please specify input filename.')
     exit()
 
 data = pd.read_csv(sys.argv[1])
