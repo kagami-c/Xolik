@@ -2,17 +2,19 @@
 #define XOLIK_XCORR_H
 
 // novel preprocessing and scoring
-std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& peaks,
+std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& peaks, 
                                double resolution) {
-    if (peaks.empty()) { return std::vector<double>(); }
-    size_t vector_size = size_t(peaks[peaks.size() - 1].first / resolution) + 1;
+    if (peaks.empty()) {
+        return std::vector<double>();
+    }
+    int vector_size = static_cast<int>(peaks[peaks.size() - 1].first / resolution) + 1;
     std::vector<double> processed_peaks(vector_size);
 
     // normalize in local range
     double min_mass = peaks[0].first;
     double max_mass = peaks[peaks.size() - 1].first;
-    const auto num_step = 10;
-    int step_unit = int(vector_size) / 10 + 1;
+    const int num_step = 10;
+    int step_unit = vector_size / 10 + 1;
 
     int start = 0;
     int end = 0;  // exclude
@@ -25,7 +27,9 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
             ++end;
         }
         // from start to end (excluded) is the range for normalization
-        if (start == end) { continue; }
+        if (start == end) {
+            continue;
+        }
         double local_max_intensity = 0;
         for (int i = start; i < end; ++i) {
             if (peaks[i].second > local_max_intensity) {
@@ -86,6 +90,7 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
     return filtered;
 }
 
+// TODO: delete this function later, DEPRECATED
 double XCorr(const std::vector<double>& spec, double resolution,
              const char* sequence, size_t sequence_length,
              size_t modified_site, double mass_shift, int maximum_charge) {
@@ -130,11 +135,14 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
         NAN /* U */, 99.06842 /* V */, 186.07932 /* W */, NAN /* X */,
         163.06333 /* Y */, NAN /* Z */
     };
+    constexpr double inv_charge[] = { 
+        0.0, 1.0 / 1.0, 1.0 / 2.0, 1.0 / 3.0, 1.0 / 4.0, 1.0 / 5.0, 1.0 / 6.0 
+    };
 
-    constexpr double inv_charge[] = { 0.0, 1.0 / 1.0, 1.0 / 2.0, 1.0 / 3.0, 1.0 / 4.0, 1.0 / 5.0, 1.0 / 6.0 };
-    const size_t spec_size = spec.size();
-    const size_t mods_size = mods.size();
+    const int spec_size = static_cast<int>(spec.size());
+    const int mods_size = static_cast<int>(mods.size());
     const double inv_resolution = 1 / resolution;
+
     double xcorr = 0.0;
 
     int b_mod_idx = 0;
@@ -157,7 +165,7 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
         }
     }
 
-    int y_mod_idx = static_cast<int>(mods.size()) - 1;  // already consider whether mods exist
+    int y_mod_idx = mods_size - 1;  // already consider whether mods exist
     double current_y_ion = WATER_MASS;
     for (int y_ion_idx = 1; y_ion_idx <= sequence_length; ++y_ion_idx) {
         current_y_ion += MassTable[sequence[sequence_length - y_ion_idx] - 'A'];
@@ -167,7 +175,8 @@ double ModXCorr(const std::vector<double>& spec, double resolution,
         if (y_mod_idx >= 0 && sequence_length - y_ion_idx == mods[y_mod_idx].first) {
             current_y_ion += mods[y_mod_idx--].second;
         }
-        for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {  // TODO: Optimize this line has to reorder the computation, which lead to unstable numerical computation.
+        // TODO: Optimize this line has to reorder the compute, lead to unstable numerical compute.
+        for (int charge_state = 1; charge_state <= maximum_charge; ++charge_state) {  
             double mz_position = current_y_ion * inv_charge[charge_state] + PROTON_MASS;
             int index = static_cast<int>(mz_position * inv_resolution);  // truncate
             if (index >= spec_size) {

@@ -12,25 +12,23 @@ inline bool IsDecoy(const char* protein_name) {
 }
 
 std::vector<double> CalculateFDR(std::vector<Record>& records, const PPData& ppdata) {
-    std::stable_sort(records.begin(), records.end(),
-                     [](const auto& one, const auto& another) {
-                         return one.score > another.score;
-                     });
-    auto target_count = 0;
-    auto semi_decoy_count = 0;
-    auto decoy_count = 0;
+    std::stable_sort(records.begin(), records.end(), 
+            [](const auto& one, const auto& another) { return one.score > another.score; });
+
+    int target_count = 0;
+    int semi_decoy_count = 0;
+    int decoy_count = 0;
     std::vector<double> fdr(records.size());
+
     for (auto i = 0; i < records.size(); ++i) {
-        const auto& record = records[i];
-        auto alpha_decoy = IsDecoy(ppdata[record.alpha_idx].protein->name);
-        auto beta_decoy = IsDecoy(ppdata[record.beta_idx].protein->name);
+        const Record& record = records[i];
+        bool alpha_decoy = IsDecoy(ppdata[record.alpha_idx].protein->name);
+        bool beta_decoy = IsDecoy(ppdata[record.beta_idx].protein->name);
         if (alpha_decoy && beta_decoy) {
             decoy_count += 1;
-        }
-        else if (alpha_decoy || beta_decoy) {
+        } else if (alpha_decoy || beta_decoy) {
             semi_decoy_count += 1;
-        }
-        else {
+        } else {
             target_count += 1;
         }
         if (target_count == 0) {
@@ -38,12 +36,10 @@ std::vector<double> CalculateFDR(std::vector<Record>& records, const PPData& ppd
                 throw std::runtime_error("Impossible path");
             }
             fdr[i] = 1;
-        }
-        else {
+        } else {
             if (semi_decoy_count <= decoy_count) {
                 fdr[i] = double(decoy_count) / double(target_count);
-            }
-            else {
+            } else {
                 fdr[i] = double(semi_decoy_count - decoy_count) / double(target_count);
             }
         }

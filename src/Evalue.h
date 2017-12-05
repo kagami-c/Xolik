@@ -36,7 +36,8 @@ bool LeastSquares(const std::vector<double>& y, const std::vector<double>& x,
 double CalculateEValue(double target, const std::vector<double>& scores) {
     using std::vector;
 
-    // generate histogram, TODO: do you need a different way to generate histogram?
+    // TODO: maybe we have to adjust the way to generate histogram
+    // generate histogram
     const size_t histogram_size = 152;
     vector<int> histogram(histogram_size, 0);
     int max_idx = 0;
@@ -114,7 +115,7 @@ double CalculateEValue(double target, const std::vector<double>& scores) {
 
     // calculate the exponent of the e value
     double exponent = a + b * int(target * 10.0 + 0.05);
-//    double evalue = pow(10.0, a + b * int(target * 10.0 + 0.05));
+//    double evalue = pow(10.0, a + b * int(target * 10.0 + 0.05));  // DEPRECATED
 //    return evalue > 999.0 ? 999.0 : evalue;
     return exponent;
 }

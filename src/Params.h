@@ -44,6 +44,7 @@ struct Params {
     std::unordered_map<char, double> var_mods = {};
 };
 
+// DEPRECATED: This mass table is also useless in current version, remove it in the future
 const std::unordered_map<char, double> MassTable = {
     { 'G', 57.02147 },{ 'A', 71.03712 },{ 'S', 87.03203 },{ 'P', 97.05277 },
     { 'V', 99.06842 },{ 'T', 101.04768 },//{ 'C', 103.00919 + 57.021464 /* Fixed Mod on C */ },
@@ -63,7 +64,7 @@ const double WATER_MASS = OXYGEN_MASS + HYDROGEN_MASS + HYDROGEN_MASS;
 // data interface, as the output of Search() routine
 struct Record {
     unsigned spec_idx;
-    double score;  // score = alpha_score + beta_score
+    double score;  // score = alpha_score + beta_score, or -log10(evalue)
 
     size_t alpha_idx;
     size_t alpha_link_site;
