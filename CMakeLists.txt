@@ -35,5 +35,5 @@ elseif(UNIX)
                                 optimized ${CMAKE_SOURCE_DIR}/lib/libppdata.a)
 endif()
 
-add_executable(unittest test/RegressionTest.cpp test/RibosomeRegression.cpp)
+add_executable(unittest test/SyntheticRegression.cpp test/RibosomeRegression.cpp)
 target_link_libraries(unittest gtest gtest_main)
