@@ -90,7 +90,6 @@ std::vector<double> Preprocess(const std::vector<std::pair<double, double>>& pea
     return filtered;
 }
 
-// TODO: delete this function later, DEPRECATED
 double XCorr(const std::vector<double>& spec, double resolution,
              const char* sequence, size_t sequence_length,
              size_t modified_site, double mass_shift, int maximum_charge) {

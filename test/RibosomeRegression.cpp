@@ -33,7 +33,7 @@ TEST(RibosomeRegression, DESTRibo_092010exp2_LEF1_101012172356) {
     Check("..\\test\\data\\ribosome_ref\\DESTRibo_092010exp2_LEF1_101012172356.mzXML.output.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RibosomeRegression, DESTRibo_092010exp2_LEF2) {
+TEST(RibosomeRegression, DISABLED_DESTRibo_092010exp2_LEF2) {
     const std::string command = "Release\\Xolik.exe "
             "-d ..\\test\\data\\ribosome_ref\\ecoli30s50s.fasta "
             "-s D:\\Spectra\\PXD003381\\DESTRibo_092010exp2_LEF2.mzXML "
@@ -103,7 +103,7 @@ TEST(RibosomeRegression, DESTRibo_092010exp2_LEF8) {
     Check("..\\test\\data\\ribosome_ref\\DESTRibo_092010exp2_LEF8.mzXML.output.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RibosomeRegression, DESTRibo_092010exp2_LEF9) {
+TEST(RibosomeRegression, DISABLED_DESTRibo_092010exp2_LEF9) {
     const std::string command = "Release\\Xolik.exe "
             "-d ..\\test\\data\\ribosome_ref\\ecoli30s50s.fasta "
             "-s D:\\Spectra\\PXD003381\\DESTRibo_092010exp2_LEF9.mzXML "

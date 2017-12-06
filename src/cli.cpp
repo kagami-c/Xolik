@@ -20,7 +20,7 @@ void WriteResults(const char* output_path, const std::vector<Record>& records,
                   const std::vector<double>& q_values) {
     std::ofstream file(output_path);
     file << "ScanNum,Score,Peptide#1,LinkSite#1,Protein#1,Score#1,"
-        "Peptide#2,LinkSite#2,Protein#2,Score#2,qValue\n";
+            "Peptide#2,LinkSite#2,Protein#2,Score#2,qValue\n";
     for (auto i = 0; i < records.size(); ++i) {
         const auto& record = records[i];
         const auto& alpha_peptide = ppdata[record.alpha_idx];
@@ -43,7 +43,7 @@ Params ParseArguments(int argc, const char** argv) {
     using StringArg = TCLAP::ValueArg<std::string>;
     using DoubleArg = TCLAP::ValueArg<double>;
     using IntArg = TCLAP::ValueArg<int>;
-    TCLAP::CmdLine cmd("Xolik - A linear-time algorithm for searching cross-linked peptides", ' ', "beta");
+    TCLAP::CmdLine cmd("Xolik - A linear-time algorithm for searching cross-linked peptides", ' ', "0.3");
     // TODO: add enzyme setting
 //    std::vector<std::string> allowed_enzymes = { "trypsin" };
 //    TCLAP::ValuesConstraint<std::string> enzyme_constraint(allowed_enzymes);
@@ -136,7 +136,7 @@ Params ParseArguments(int argc, const char** argv) {
 
 // TODO: Adjust setting print after all stuffs are finished
 void PrintSettings(const Params& params) {
-    printf("Xolik ver.beta (%s, %s)\n", __DATE__, __TIME__);
+    printf("Xolik version 0.3 (%s, %s)\n", __DATE__, __TIME__);
     printf("Database:              %s\n", params.database_path.c_str());
     printf("Spectra:               %s\n", params.mzfile_path.c_str());
     printf("Output path:           %s\n", params.output_path.c_str());
@@ -151,11 +151,17 @@ void PrintSettings(const Params& params) {
     printf("MS2 tolerance:         %.4f Da\n", params.ms2_tolerance);
     printf("Score threshold:       %.4f\n", params.threshold);
     printf("Enable rank filter:    %s\n", params.enable_rank ? "true" : "false");
-    printf("Rank threshold:        %d\n", params.rank);
+    if (params.enable_rank) {
+        printf("Rank threshold:        %d\n", params.rank);
+    }
     printf("Use E-value:           %s\n", params.use_E_value ? "true" : "false");
-    printf("Histogram size:        %d\n", params.histogram_size);
+    if (params.use_E_value) {
+        printf("Histogram size:        %d\n", params.histogram_size);
+    }
     printf("Parallel computing:    %s\n", params.enable_parallel ? "true" : "false");
-    printf("Number of threads:     %d\n", params.thread);
+    if (params.enable_parallel) {
+        printf("Number of threads:     %d\n", params.thread);
+    }
     printf("Enzyme:                %s\n", params.enzyme.c_str());
 
     auto print_map = [](const std::unordered_map<char, double>& map) {
