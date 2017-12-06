@@ -22,12 +22,12 @@ public:
             const auto& peptide = *(pparray_[idx].raw_peptide);
             auto site = pparray_[idx].link_site;
             auto mass_shift = precursor_mass_ - peptide.mass;
-//            auto xcorr = XCorr(processed_peaks_, ms2_tolerance_, peptide.sequence,
-//                               peptide.sequence_length, site, mass_shift, maximum_charge_);
+            auto xcorr = XCorr(processed_peaks_, ms2_tolerance_, peptide.sequence,
+                               peptide.sequence_length, site, mass_shift, maximum_charge_);
             const auto& mods = pparray_[idx].mods;
-            auto xcorr = ModXCorr(processed_peaks_, ms2_tolerance_, 
-                                  peptide.sequence, peptide.sequence_length, 
-                                  site, mass_shift, maximum_charge_, mods);
+//            auto xcorr = ModXCorr(processed_peaks_, ms2_tolerance_, 
+//                                  peptide.sequence, peptide.sequence_length, 
+//                                  site, mass_shift, maximum_charge_, mods);
             cache_scores_[idx] = xcorr;
             cache_flags_[idx] = 1;
             return xcorr;

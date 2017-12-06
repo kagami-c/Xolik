@@ -15,7 +15,7 @@ void Check(std::string reference_file, std::string test_file) {
 	EXPECT_TRUE(ref_file.eof());
 }
 
-TEST(RegressionTest, Xolik_lib1) {
+TEST(SyntheticRegression, DISABLED_Xolik_lib1) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
@@ -25,7 +25,7 @@ TEST(RegressionTest, Xolik_lib1) {
 	Check("..\\test\\data\\lib1.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Xolik_lib1_noevalue) {
+TEST(SyntheticRegression, Xolik_lib1_noevalue) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
@@ -35,7 +35,7 @@ TEST(RegressionTest, Xolik_lib1_noevalue) {
     Check("..\\test\\data\\lib1_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, DISABLED_Xolik_lib2) {
+TEST(SyntheticRegression, DISABLED_Xolik_lib2) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
@@ -45,7 +45,7 @@ TEST(RegressionTest, DISABLED_Xolik_lib2) {
     Check("..\\test\\data\\lib2.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Xolik_lib2_noevalue) {
+TEST(SyntheticRegression, Xolik_lib2_noevalue) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
@@ -55,7 +55,7 @@ TEST(RegressionTest, Xolik_lib2_noevalue) {
     Check("..\\test\\data\\lib2_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, DISABLED_Xolik_lib3) {
+TEST(SyntheticRegression, DISABLED_Xolik_lib3) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib3_90min_CID35.mzXML "
@@ -65,7 +65,7 @@ TEST(RegressionTest, DISABLED_Xolik_lib3) {
     Check("..\\test\\data\\lib3.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Xolik_lib3_noevalue) {
+TEST(SyntheticRegression, Xolik_lib3_noevalue) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib3_90min_CID35.mzXML "
@@ -75,7 +75,7 @@ TEST(RegressionTest, Xolik_lib3_noevalue) {
     Check("..\\test\\data\\lib3_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Xolik_lib1_parallel) {
+TEST(SyntheticRegression, DISABLED_Xolik_lib1_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
@@ -85,7 +85,7 @@ TEST(RegressionTest, Xolik_lib1_parallel) {
     Check("..\\test\\data\\lib1.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Xolik_lib1_noevalue_parallel) {
+TEST(SyntheticRegression, Xolik_lib1_noevalue_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
@@ -95,7 +95,7 @@ TEST(RegressionTest, Xolik_lib1_noevalue_parallel) {
     Check("..\\test\\data\\lib1_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, DISABLED_Xolik_lib2_parallel) {
+TEST(SyntheticRegression, DISABLED_Xolik_lib2_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
@@ -105,7 +105,7 @@ TEST(RegressionTest, DISABLED_Xolik_lib2_parallel) {
     Check("..\\test\\data\\lib2.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Xolik_lib2_noevalue_parallel) {
+TEST(SyntheticRegression, Xolik_lib2_noevalue_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
@@ -115,7 +115,7 @@ TEST(RegressionTest, Xolik_lib2_noevalue_parallel) {
     Check("..\\test\\data\\lib2_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, DISABLED_Xolik_lib3_parallel) {
+TEST(SyntheticRegression, DISABLED_Xolik_lib3_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib3_90min_CID35.mzXML "
@@ -125,7 +125,7 @@ TEST(RegressionTest, DISABLED_Xolik_lib3_parallel) {
     Check("..\\test\\data\\lib3.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Xolik_lib3_noevalue_parallel) {
+TEST(SyntheticRegression, Xolik_lib3_noevalue_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib3_90min_CID35.mzXML "
@@ -135,7 +135,7 @@ TEST(RegressionTest, Xolik_lib3_noevalue_parallel) {
     Check("..\\test\\data\\lib3_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Naive_lib1_noevalue) {
+TEST(SyntheticRegression, Naive_lib1_noevalue) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
@@ -145,7 +145,7 @@ TEST(RegressionTest, Naive_lib1_noevalue) {
     Check("..\\test\\data\\lib1_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Naive_lib2_noevalue) {
+TEST(SyntheticRegression, Naive_lib2_noevalue) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
@@ -155,7 +155,7 @@ TEST(RegressionTest, Naive_lib2_noevalue) {
     Check("..\\test\\data\\lib2_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Naive_lib3_noevalue) {
+TEST(SyntheticRegression, Naive_lib3_noevalue) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib3_90min_CID35.mzXML "
@@ -165,7 +165,7 @@ TEST(RegressionTest, Naive_lib3_noevalue) {
     Check("..\\test\\data\\lib3_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Naive_lib1_noevalue_parallel) {
+TEST(SyntheticRegression, Naive_lib1_noevalue_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib1_90min_CID35.mzXML "
@@ -175,7 +175,7 @@ TEST(RegressionTest, Naive_lib1_noevalue_parallel) {
     Check("..\\test\\data\\lib1_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Naive_lib2_noevalue_parallel) {
+TEST(SyntheticRegression, Naive_lib2_noevalue_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib2_90min_CID35.mzXML "
@@ -185,7 +185,7 @@ TEST(RegressionTest, Naive_lib2_noevalue_parallel) {
     Check("..\\test\\data\\lib2_noevalue.csv", "C:\\Users\\Jiaan\\Desktop\\temp.csv");
 }
 
-TEST(RegressionTest, Naive_lib3_noevalue_parallel) {
+TEST(SyntheticRegression, Naive_lib3_noevalue_parallel) {
     const std::string command = "Release\\Xolik.exe "
         "-o C:\\Users\\Jiaan\\Desktop\\temp.csv "
         "-s C:\\Users\\Jiaan\\Desktop\\Experiments\\Exp2\\mxdb\\20111221_ananiav_DPDS_lib3_90min_CID35.mzXML "

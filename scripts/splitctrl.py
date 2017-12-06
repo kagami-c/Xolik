@@ -59,9 +59,15 @@ for i in range(0, len(intra)):
     target = intra['Total'][i] - intra['CumU'][i] - intra['CumF'][i]
     target = float(target)
     if intra['CumU'][i] <= intra['CumF'][i]:
-        fdrs.append(intra['CumF'][i] / target)
+        if target == 0:
+            fdrs.append(1.0)
+        else:
+            fdrs.append(intra['CumF'][i] / target)
     else:
-        fdrs.append((intra['CumU'][i] - intra['CumF'][i])/target)
+        if target == 0:
+            fdrs.append(1.0)
+        else:
+            fdrs.append((intra['CumU'][i] - intra['CumF'][i])/target)
 intra['FDR'] = pd.Series(fdrs)
 intra['FDR'] = intra['FDR'].clip(None, 1)
 
@@ -93,9 +99,15 @@ for i in range(0, len(inter)):
     target = inter['Total'][i] - inter['CumU'][i] - inter['CumF'][i]
     target = float(target)
     if inter['CumU'][i] <= inter['CumF'][i]:
-        fdrs.append(inter['CumF'][i] / target)
+        if target == 0:
+            fdrs.append(1.0)
+        else:
+            fdrs.append(inter['CumF'][i] / target)
     else:
-        fdrs.append((inter['CumU'][i] - inter['CumF'][i])/target)
+        if target == 0:
+            fdrs.append(1.0)
+        else:
+            fdrs.append((inter['CumU'][i] - inter['CumF'][i])/target)
 inter['FDR'] = pd.Series(fdrs)
 inter['FDR'] = inter['FDR'].clip(None, 1)
 
