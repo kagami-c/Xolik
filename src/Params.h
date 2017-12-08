@@ -33,7 +33,7 @@ struct Params {
     
     // evalue
     bool use_E_value = true;
-    int histogram_size = 15000;
+    int histogram_size = 30000;
 
     // parallel
     bool enable_parallel = false;

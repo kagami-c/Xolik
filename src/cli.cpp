@@ -57,8 +57,8 @@ Params ParseArguments(int argc, const char** argv) {
                                     false, 4, "INT", cmd);
     TCLAP::SwitchArg parallel_arg("", "parallel", "Enable parallel computing by multi-threading", cmd);
     IntArg histogram_size_arg("", "histogram_size",
-                              "Minimum data points required to build histogram for E-value estimation", 
-                              false, 15000, "SIZE", cmd);
+                              "Maximum data points used to build histogram for E-value estimation", 
+                              false, 30000, "SIZE", cmd);
     TCLAP::SwitchArg noevalue_arg("", "noevalue", 
                                   "Disable E-value estimation, E-value will be reported as -log10(evalue)", cmd);
     IntArg rank_arg("", "rank", "Rank threshold, used together with --enable_rank",
