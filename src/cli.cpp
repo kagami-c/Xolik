@@ -21,10 +21,10 @@ void WriteResults(const char* output_path, const std::vector<Record>& records,
     std::ofstream file(output_path);
     file << "ScanNum,Score,Peptide#1,LinkSite#1,Protein#1,Score#1,"
             "Peptide#2,LinkSite#2,Protein#2,Score#2,qValue";
-	if (params.output_rank) {
-		file << ",Rank#1,Rank#2";
-	}
-	file << "\n";
+    if (params.output_rank) {
+        file << ",Rank#1,Rank#2";
+    }
+    file << "\n";
     for (auto i = 0; i < records.size(); ++i) {
         const auto& record = records[i];
         const auto& alpha_peptide = ppdata[record.alpha_idx];
@@ -40,10 +40,10 @@ void WriteResults(const char* output_path, const std::vector<Record>& records,
              << beta_peptide.c_term << ',' << record.beta_link_site << ','
              << std::string(beta_protein.name, FindProteinNameEnd(beta_protein.name)) << ','
              << record.beta_score << ',' << q_values[i]; 
-    	if (params.output_rank) {
-			file << ',' << record.alpha_rank << ',' << record.beta_rank;
-    	}
-    	file << '\n';
+        if (params.output_rank) {
+            file << ',' << record.alpha_rank << ',' << record.beta_rank;
+        }
+        file << '\n';
     }
 }
 
