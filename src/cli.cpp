@@ -20,7 +20,11 @@ void WriteResults(const char* output_path, const std::vector<Record>& records,
                   const std::vector<double>& q_values) {
     std::ofstream file(output_path);
     file << "ScanNum,Score,Peptide#1,LinkSite#1,Protein#1,Score#1,"
-            "Peptide#2,LinkSite#2,Protein#2,Score#2,qValue\n";
+            "Peptide#2,LinkSite#2,Protein#2,Score#2,qValue";
+	if (params.output_rank) {
+		file << ",Rank#1,Rank#2";
+	}
+	file << "\n";
     for (auto i = 0; i < records.size(); ++i) {
         const auto& record = records[i];
         const auto& alpha_peptide = ppdata[record.alpha_idx];
@@ -35,7 +39,11 @@ void WriteResults(const char* output_path, const std::vector<Record>& records,
              << std::string(beta_peptide.sequence, beta_peptide.sequence_length) << '.'
              << beta_peptide.c_term << ',' << record.beta_link_site << ','
              << std::string(beta_protein.name, FindProteinNameEnd(beta_protein.name)) << ','
-             << record.beta_score << ',' << q_values[i] << '\n';
+             << record.beta_score << ',' << q_values[i]; 
+    	if (params.output_rank) {
+			file << ',' << record.alpha_rank << ',' << record.beta_rank;
+    	}
+    	file << '\n';
     }
 }
 
@@ -48,6 +56,7 @@ Params ParseArguments(int argc, const char** argv) {
 //    std::vector<std::string> allowed_enzymes = { "trypsin" };
 //    TCLAP::ValuesConstraint<std::string> enzyme_constraint(allowed_enzymes);
 //    StringArg enzyme_arg("", "enzyme", "Enzyme for in silico digestion.", false, "trypsin", &enzyme_constraint, cmd);
+    TCLAP::SwitchArg output_rank_arg("", "output_rank", "Output the rank of single peptides (will slow down the search)", cmd);
     TCLAP::SwitchArg clrmod_arg("", "clear_mod", "Clear modification table", cmd);
     StringArg varmod_arg("", "varmod", "Variable modifications (Example: \"M+15.9949:S+79.96633\", use + or - to "
                          "connect AA with MASS, use : to separate multiple mods)", false, "", "PATTERN", cmd);
@@ -100,6 +109,7 @@ Params ParseArguments(int argc, const char** argv) {
     params.histogram_size = histogram_size_arg.getValue();
     params.enable_parallel = parallel_arg.getValue();
     params.thread = thread_arg.getValue();
+    params.output_rank = output_rank_arg.getValue();
 
     auto mod_pattern_parse = [](const std::string& arg) {
         std::unordered_map<char, double> map_out;
@@ -163,6 +173,7 @@ void PrintSettings(const Params& params) {
         printf("Number of threads:     %d\n", params.thread);
     }
     printf("Enzyme:                %s\n", params.enzyme.c_str());
+    printf("Output rank:           %s\n", params.output_rank ? "true" : "false");
 
     auto print_map = [](const std::unordered_map<char, double>& map) {
         if (map.empty()) {

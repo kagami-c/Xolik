@@ -44,6 +44,9 @@ struct Params {
 //        { 'C', +57.021464 } 
     };
     std::unordered_map<char, double> var_mods = {};  // have not tested
+
+    // output options
+    bool output_rank = false;
 };
 
 // DEPRECATED: This mass table is also useless in current version, remove it in the future
@@ -74,6 +77,9 @@ struct Record {
     size_t beta_link_site;
     double alpha_score;
     double beta_score;
+
+    size_t alpha_rank;
+    size_t beta_rank;
 };
 
 #endif // XOLIK_PARAMS_H

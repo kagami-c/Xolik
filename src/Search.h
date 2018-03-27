@@ -101,6 +101,25 @@ bool SearchSpectrum(const MzLoader::Spectrum& spectrum, const std::vector<double
         report_score = -evalue -log10(double(match_count) / double(collect_count));
     }
 
+    // compute rank
+	double alpha_score = score_array[std::get<0>(max_match)];
+	double beta_score = score_array[std::get<1>(max_match)];
+    size_t alpha_rank = 0;
+    size_t beta_rank = 0;
+    if (params.output_rank) {
+		++alpha_rank;
+		++beta_rank;  // make rank start from 1
+		for (int i = 0; i < score_array.size(); ++i) {
+			double s = score_array[i];
+			if (s > alpha_score) {
+				++alpha_rank;
+			}
+			if (s > beta_score) {
+				++beta_rank;
+			}
+		}
+    }
+
     // build record
     record_out = {
         spectrum.scan_num,  // SpecIdx
@@ -110,7 +129,9 @@ bool SearchSpectrum(const MzLoader::Spectrum& spectrum, const std::vector<double
         pparray[std::get<1>(max_match)].raw_index,  // PeptIdx
         pparray[std::get<1>(max_match)].link_site,  // link site
         score_array[std::get<0>(max_match)],  // Score
-        score_array[std::get<1>(max_match)]  // Score
+        score_array[std::get<1>(max_match)],  // Score
+        alpha_rank,  // Rank
+        beta_rank  // Rank
     };
     return true;
 }
