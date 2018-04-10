@@ -56,8 +56,6 @@ Params ParseArguments(int argc, const char** argv) {
 //    std::vector<std::string> allowed_enzymes = { "trypsin" };
 //    TCLAP::ValuesConstraint<std::string> enzyme_constraint(allowed_enzymes);
 //    StringArg enzyme_arg("", "enzyme", "Enzyme for in silico digestion.", false, "trypsin", &enzyme_constraint, cmd);
-    DoubleArg mlmass_arg("", "mlmass", "Mono linker mass", false, 156.0786, "Da", cmd);
-    TCLAP::SwitchArg search_linear_arg("", "search_linear", "Search linear and mono-linked peptides.", cmd);
     TCLAP::SwitchArg output_rank_arg("", "output_rank", "Output the rank of single peptides (will slow down the search)", cmd);
     TCLAP::SwitchArg clrmod_arg("", "clear_mod", "Clear modification table", cmd);
     StringArg varmod_arg("", "varmod", "Variable modifications (Example: \"M+15.9949:S+79.96633\", use + or - to "
@@ -112,8 +110,6 @@ Params ParseArguments(int argc, const char** argv) {
     params.enable_parallel = parallel_arg.getValue();
     params.thread = thread_arg.getValue();
     params.output_rank = output_rank_arg.getValue();
-    params.search_linear = search_linear_arg.getValue();
-    params.mlmass = mlmass_arg.getValue();
 
     auto mod_pattern_parse = [](const std::string& arg) {
         std::unordered_map<char, double> map_out;
@@ -148,6 +144,7 @@ Params ParseArguments(int argc, const char** argv) {
     return params;
 }
 
+// TODO: Adjust setting print after all stuffs are finished
 void PrintSettings(const Params& params) {
     printf("Xolik version 0.3 (%s, %s)\n", __DATE__, __TIME__);
     printf("Database:              %s\n", params.database_path.c_str());
@@ -177,10 +174,6 @@ void PrintSettings(const Params& params) {
     }
     printf("Enzyme:                %s\n", params.enzyme.c_str());
     printf("Output rank:           %s\n", params.output_rank ? "true" : "false");
-    printf("Search linear peptide: %s\n", params.search_linear ? "true" : "false");
-    if (params.search_linear) {
-        printf("Mono linker mass:      %f Da\n", params.mlmass);
-    }
 
     auto print_map = [](const std::unordered_map<char, double>& map) {
         if (map.empty()) {

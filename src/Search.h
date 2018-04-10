@@ -131,8 +131,7 @@ bool SearchSpectrum(const MzLoader::Spectrum& spectrum, const std::vector<double
         score_array[std::get<0>(max_match)],  // Score
         score_array[std::get<1>(max_match)],  // Score
         alpha_rank,  // Rank
-        beta_rank,  // Rank
-        PeptideType::Cross_linked  // peptide type
+        beta_rank  // Rank
     };
     return true;
 }

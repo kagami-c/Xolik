@@ -47,10 +47,6 @@ struct Params {
 
     // output options
     bool output_rank = false;
-
-    // linear and mono-linked
-    bool search_linear = false;
-    double mlmass = 156.0786;
 };
 
 // DEPRECATED: This mass table is also useless in current version, remove it in the future
@@ -70,14 +66,6 @@ const double HYDROGEN_MASS = 1.00782;
 const double OXYGEN_MASS = 15.99491;
 const double WATER_MASS = OXYGEN_MASS + HYDROGEN_MASS + HYDROGEN_MASS;
 
-enum class PeptideType {
-    Unknown,
-    Cross_linked,
-    Linear,
-    Mono_linked,
-    Loop_linked
-};
-
 // data interface, as the output of Search() routine
 struct Record {
     unsigned spec_idx;
@@ -92,8 +80,6 @@ struct Record {
 
     size_t alpha_rank;
     size_t beta_rank;
-
-    PeptideType peptide_type;
 };
 
 #endif // XOLIK_PARAMS_H
