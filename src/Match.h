@@ -67,7 +67,7 @@ std::tuple<CandIdx, CandIdx, Score> XolikMatch(const std::vector<double>& mass_a
             }
             auto local_max = score_array[forward_idx] + score_array[deque.front()];
             if (std::get<0>(global_max_info) == scores_size
-                    || local_max > std::get<2>(global_max_info)) {
+                    || local_max >= std::get<2>(global_max_info)) {
                 global_max_info = std::make_tuple(forward_idx, deque.front(), local_max);
             }
         }
@@ -125,7 +125,7 @@ std::tuple<CandIdx, CandIdx, Score> NaiveMatch(const std::vector<double>& mass_a
 
         auto local_max = score_array[i] + score_array[local_max_idx];
         if (std::get<0>(global_max_info) == scores_size
-                || local_max > std::get<2>(global_max_info)) {
+                || local_max >= std::get<2>(global_max_info)) {
             global_max_info = std::make_tuple(i, local_max_idx, local_max);
         }
     }
